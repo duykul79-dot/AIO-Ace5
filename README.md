@@ -34,7 +34,7 @@ Module được phát triển chủ yếu cho:
 
 - Thiết bị: **OnePlus Ace 5/13R**
 - Model: **PKG110**
-- Nền tảng: **ColorOS / OPlus**
+- Nền tảng: **ColorOS / OxygenOS**
 - Root: **KernelSU / Magisk / APatch**
 - Kiến trúc: **arm64-v8a**
 
