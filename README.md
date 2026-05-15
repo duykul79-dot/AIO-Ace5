@@ -1,6 +1,6 @@
 ﻿# AIO Ace5
 
-**AIO Ace5** là module tuỳ biến dành cho **OnePlus Ace 5 / PKG110** chạy nền **ColorOS / OPlus**, hỗ trợ các môi trường root như **KernelSU**, **Magisk** và **APatch**.
+**AIO Ace5** là module tuỳ biến dành cho **OnePlus Ace 5/13R** chạy nền **ColorOS / OxygenOS**, hỗ trợ các môi trường root như **KernelSU**, **Magisk** và **APatch**.
 
 Module tập trung vào các nhóm tính năng chính: **Debloat**, **Dọn rác**, **Pin**, **Hiệu năng**, **WebUI**, **Realtime Log**, **Zygisk component** và hỗ trợ xuất log/report để tiện kiểm tra, audit hoặc báo lỗi.
 
@@ -32,7 +32,7 @@ Mục tiêu chính:
 
 Module được phát triển chủ yếu cho:
 
-- Thiết bị: **OnePlus Ace 5**
+- Thiết bị: **OnePlus Ace 5/13R**
 - Model: **PKG110**
 - Nền tảng: **ColorOS / OPlus**
 - Root: **KernelSU / Magisk / APatch**
