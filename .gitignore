@@ -31,3 +31,11 @@ __MACOSX/
 
 # But allow release manifest/docs if needed
 !docs/**
+
+# Internal development / AI-agent workflow
+.codex/
+audits/
+notes/
+AGENTS.md
+PROJECT_STATE.md
+TASK.md

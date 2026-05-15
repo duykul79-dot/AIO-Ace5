@@ -1,5 +1,0 @@
-﻿# Project-scoped Codex config for AIO Ace5 v3.1
-# Keep Codex working inside this workspace only.
-
-approval_policy = "on-failure"
-sandbox_mode = "workspace-write"
