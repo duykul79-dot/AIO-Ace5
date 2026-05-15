@@ -1,6 +1,6 @@
 # AIO Ace5
 
-**AIO Ace5** is a customization module for **OnePlus Ace 5 / PKG110** running **ColorOS / OPlus**, designed for rooted environments such as **KernelSU**, **Magisk**, and **APatch**.
+**AIO Ace5** is a customization module for **OnePlus Ace 5/13R** running **ColorOS / OPlus**, designed for rooted environments such as **KernelSU**, **Magisk**, and **APatch**.
 
 The module focuses on **Debloat**, **Cleanup**, **Battery**, **Performance**, **WebUI**, **Realtime Log**, **Zygisk component**, and log/report export for easier checking, auditing, and debugging.
 
@@ -34,7 +34,7 @@ This module is mainly developed for:
 
 - Device: **OnePlus Ace 5**
 - Model: **PKG110**
-- Platform: **ColorOS / OPlus**
+- Platform: **ColorOS / OxygenOS**
 - Root environment: **KernelSU / Magisk / APatch**
 - Architecture: **arm64-v8a**
 
