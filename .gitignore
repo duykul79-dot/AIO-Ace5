@@ -39,3 +39,11 @@ notes/
 AGENTS.md
 PROJECT_STATE.md
 TASK.md
+
+# Internal development / AI-agent workflow
+.codex/
+audits/
+notes/
+AGENTS.md
+PROJECT_STATE.md
+TASK.md
