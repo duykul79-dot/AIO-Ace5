@@ -1,0 +1,885 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>AIO Ace5 v3.0.3RC — Báo cáo Audit toàn module (rev 1.1)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --bg:#0f1115; --panel:#161a22; --panel2:#1c2230; --line:#232a3a; --muted:#8a93a6;
+  --text:#e6e9f2; --accent:#5b9dff; --accent2:#7ee0c4;
+  --crit:#ff4d6d; --high:#ff8a3d; --med:#ffcd3a; --low:#7ee0c4; --info:#9ab8ff; --ok:#56d364;
+  --code:#0a0d13;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:14px/1.55 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+header{padding:28px 28px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#181d29,#0f1115)}
+header h1{margin:0 0 6px;font-size:24px;letter-spacing:.2px}
+header .sub{color:var(--muted);font-size:13px}
+.container{max-width:1180px;margin:0 auto;padding:0 28px 60px}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:18px 0 22px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.kpi .l{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.6px}
+.kpi .v{font-size:18px;font-weight:600;margin-top:4px}
+.kpi.crit .v{color:var(--crit)} .kpi.high .v{color:var(--high)} .kpi.med .v{color:var(--med)} .kpi.low .v{color:var(--low)} .kpi.info .v{color:var(--info)}
+section{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:18px 0}
+section h2{margin:0 0 10px;font-size:18px;border-bottom:1px solid var(--line);padding-bottom:8px}
+section h3{margin:16px 0 6px;font-size:15px;color:#cfd6e6}
+section h4{margin:14px 0 4px;font-size:13px;color:#aab4c8}
+.muted{color:var(--muted)}
+.row{display:grid;grid-template-columns:200px 1fr;gap:14px;margin:3px 0}
+.row .k{color:var(--muted)}
+.tags{margin:4px 0}
+.tag{display:inline-block;padding:2px 8px;border-radius:999px;background:#222a3a;color:#cfd6e6;font-size:11px;margin-right:6px;border:1px solid #303a50}
+.tag.crit{background:rgba(255,77,109,.12);color:var(--crit);border-color:rgba(255,77,109,.35)}
+.tag.high{background:rgba(255,138,61,.12);color:var(--high);border-color:rgba(255,138,61,.4)}
+.tag.med{background:rgba(255,205,58,.12);color:var(--med);border-color:rgba(255,205,58,.4)}
+.tag.low{background:rgba(126,224,196,.12);color:var(--low);border-color:rgba(126,224,196,.4)}
+.tag.info{background:rgba(154,184,255,.12);color:var(--info);border-color:rgba(154,184,255,.4)}
+.tag.ok{background:rgba(86,211,100,.12);color:var(--ok);border-color:rgba(86,211,100,.4)}
+.finding{border-left:3px solid var(--info);background:var(--panel2);border-radius:8px;padding:12px 14px;margin:10px 0}
+.finding.crit{border-left-color:var(--crit)}
+.finding.high{border-left-color:var(--high)}
+.finding.med{border-left-color:var(--med)}
+.finding.low{border-left-color:var(--low)}
+.finding.ok{border-left-color:var(--ok)}
+.finding .t{font-weight:600;margin-bottom:4px}
+.finding .meta{color:var(--muted);font-size:12px;margin:2px 0 6px}
+.finding code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--code);padding:1px 5px;border-radius:4px;font-size:12px;color:#cfe7c8}
+.finding p{margin:6px 0}
+pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow:auto;font-size:12.5px;color:#cfe7c8;line-height:1.5;margin:8px 0}
+code.path{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0a0d13;color:#7ee0c4;padding:1px 6px;border-radius:4px;font-size:12px}
+table{width:100%;border-collapse:collapse;margin:8px 0;font-size:13px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:12px;letter-spacing:.4px;text-transform:uppercase}
+tbody tr:hover{background:#1a2030}
+.toc ol{margin:0;padding-left:18px}
+.toc li{margin:4px 0}
+hr{border:0;border-top:1px solid var(--line);margin:14px 0}
+.smallnote{color:var(--muted);font-size:12px;font-style:italic;margin-top:6px}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)} .row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>AIO Ace5 v3.0.3RC — Báo cáo Audit toàn module <span style="font-size:14px;color:var(--muted)">(rev 1.1, đã đối chiếu GPT)</span></h1>
+  <div class="sub">Static-analysis audit · 33 file · <b>7 015 LOC shell</b> · WebUI 2 216 LOC · 2 Zygisk ELF · 2 COPG controller ELF · rev 1.1 ngày 2026-05-13</div>
+</header>
+
+<div class="container">
+
+<section>
+<h2>0. Tóm tắt điều hành</h2>
+<p>Module AIO Ace5 v3.0.3RC là một bộ công cụ Magisk/KernelSU/APatch khá lớn nhắm tới ColorOS 15-16 trên Qualcomm SM8650 (OnePlus Ace 5 / Realme GT-class). Module gói gọn 5 nhóm tính năng: <b>Debloat</b>, <b>Cleanup</b>, <b>Battery analysis</b>, <b>Performance tuning</b> (Game Max / Charge Max / Thermal Shutdown / 360 Hz touch), và <b>Game device-identity spoofing</b> (Zygisk + COPG controller).</p>
+
+<p><b>Đánh giá tổng thể:</b> chất lượng code <span class="tag ok">khá cao</span> so với mặt bằng các module Magisk Việt hóa — có TOCTOU defense, có path-canonicalization, có singleton lock, có rollback path, có XSS-escape trong WebUI, có gating bằng flag-file để tránh bootloop. Không phát hiện lỗ hổng nghiêm trọng kiểu <code>eval</code> động, command injection, hay path traversal khai thác được. Các phát hiện chủ yếu là <b>medium/low</b> về quality-of-code, dead pattern, vài chỗ POSIX-strict không tuân thủ (nhưng chạy ổn vì Android shell là mksh), và một vài điểm packaging cần dọn.</p>
+
+<div class="kpis">
+  <div class="kpi crit"><div class="l">Critical</div><div class="v">0</div></div>
+  <div class="kpi high"><div class="l">High</div><div class="v">2</div></div>
+  <div class="kpi med"><div class="l">Medium</div><div class="v">11</div></div>
+  <div class="kpi low"><div class="l">Low</div><div class="v">14</div></div>
+  <div class="kpi info"><div class="l">Info / Observation</div><div class="v">11</div></div>
+  <div class="kpi"><div class="l">Tổng số file</div><div class="v">33</div></div>
+</div>
+
+<h3>Top-3 ưu tiên xử lý</h3>
+<ol>
+  <li><b>H-01:</b> <code>post-fs-data.sh</code> bind-mount stub vào <code>/system/bin/logd</code> và <code>/system/bin/update_engine</code> rất sớm trong boot — gating bằng <code>cooldown_enabled.flag</code> là đúng, nhưng <i>nếu</i> stub bị xóa hoặc permission sai (sau OTA stale, hoặc storage corruption) thì có thể gây <b>bootloop</b>. Khuyến nghị thêm bước fallback: nếu bind fail thì <b>vẫn</b> để daemon gốc chạy, và log lý do.</li>
+  <li><b>H-02:</b> <code>uninstall.sh</code> có thể <code>rm -rf /data/adb/modules/COPG</code> khi marker <code>.aio_owned</code> tồn tại. Nếu marker bị ghi nhầm vào COPG module của bên thứ 3 (vd. trùng tên thư mục) thì sẽ xóa nhầm module người dùng. Marker check hiện đã đúng, nhưng nên thêm bước verify thêm bằng file thứ hai (vd. <code>.aio_signature_v303rc</code>) để chống false-positive.</li>
+  <li><b>M-04:</b> <code>bin/game_spoof_config.json</code> hiện chứa absolute path <i>build-environment</i> bị bỏ sót: <code>/mnt/data/aio_fix6_work/bin/game_spoof_cpuinfo.txt</code>. <code>aio_game_spoof.sh --enable</code> sẽ rewrite ở runtime, nhưng JSON này được commit dưới dạng "as shipped" — gây nhầm lẫn khi đọc, và nếu có flow nào bypass <code>--enable</code> thì sẽ trỏ vào path không tồn tại.</li>
+</ol>
+</section>
+
+<section class="toc">
+<h2>1. Mục lục</h2>
+<ol>
+  <li><a href="#scope">Phạm vi & phương pháp audit</a></li>
+  <li><a href="#inventory">Inventory file & kiến trúc</a></li>
+  <li><a href="#meta">META-INF, module.prop, sepolicy, customize.sh</a></li>
+  <li><a href="#lifecycle">Service lifecycle: post-fs-data / service / uninstall</a></li>
+  <li><a href="#debloat">Debloat module (debloat.sh + catalog)</a></li>
+  <li><a href="#cleanup">Cleanup engine (cleanup_ace5_v10_5.sh)</a></li>
+  <li><a href="#perf">Performance + Extreme Generator + Touch 360Hz</a></li>
+  <li><a href="#spoof">Game Spoof (Zygisk + COPG engine)</a></li>
+  <li><a href="#battery">Battery analysis subsystem</a></li>
+  <li><a href="#webui">WebUI: index.html + run.sh bridge</a></li>
+  <li><a href="#binaries">Binary metadata (Zygisk SO + COPG controller)</a></li>
+  <li><a href="#cross">Cross-cutting findings & shellcheck rollup</a></li>
+  <li><a href="#recs">Khuyến nghị tổng hợp</a></li>
+</ol>
+</section>
+
+<section id="scope">
+<h2>2. Phạm vi & phương pháp audit</h2>
+<div class="row"><div class="k">Phạm vi</div><div>Toàn bộ 33 file trong cây module sau khi đã unzip <code>AIO_Ace5_v3.0.4RC.zip</code>: META-INF, module.prop, sepolicy.rule, customize.sh, post-fs-data.sh, service.sh, uninstall.sh, <code>bin/</code> (12 file shell + 4 config + 2 ELF), <code>common/</code> (2 stub), <code>webroot/</code> (HTML + bridge), <code>zygisk/</code> (2 ELF).</div></div>
+<div class="row"><div class="k">Phương pháp</div><div>Static analysis: đọc source line-by-line, <code>shellcheck -s sh</code> trên tất cả script, kiểm tra ELF magic bytes, grep XSS sink (<code>innerHTML</code>, <code>eval</code>, <code>document.write</code>) trong WebUI, so khớp tính nhất quán giữa scripts và config.</div></div>
+<div class="row"><div class="k">Không bao gồm</div><div>Dynamic testing trên thiết bị thật, reverse-engineering Zygisk SO / COPG controller ELF, fuzz config, mô phỏng boot trên emulator. Vì không có thiết bị target SM8650 / ColorOS 15-16 trong sandbox.</div></div>
+<div class="row"><div class="k">Severity scale</div><div>
+  <span class="tag crit">Critical</span> = lỗ hổng bảo mật khai thác được, data loss, hoặc bootloop chắc chắn ·
+  <span class="tag high">High</span> = bug logic / failure mode ảnh hưởng hệ thống nhưng cần điều kiện ·
+  <span class="tag med">Medium</span> = lỗi code-quality, dead pattern, robustness ·
+  <span class="tag low">Low</span> = cosmetic, POSIX-strict, ergonomics ·
+  <span class="tag info">Info</span> = observation / architecture note
+</div></div>
+</section>
+
+<section id="inventory">
+<h2>3. Inventory file & kiến trúc</h2>
+<p>Tổng cộng <b>33 file</b>, trong đó <b>18 script shell</b> (<b>7 015 LOC</b> shell-only, đếm cả <code>META-INF/.../update-binary</code>), <b>5 file config text/JSON</b>, <b>2 ELF Zygisk</b>, <b>2 ELF COPG controller</b>, <b>1 file WebUI HTML</b> (2 216 LOC + inline JS/CSS). <span class="muted">Rev 1.0 ban đầu đếm nhầm 9 226 LOC shell — số đó thực ra đã bao gồm cả <code>webroot/index.html</code>.</span></p>
+
+<h3>Cây tổng quan</h3>
+<pre>AIO_Ace5/
+├── META-INF/com/google/android/
+│   ├── update-binary               # Magisk install wrapper (5 dòng)
+│   └── updater-script              # `#MAGISK` magic marker
+├── module.prop                     # id, name, version, minKernelSU=11580
+├── sepolicy.rule                   # rỗng có chủ ý (không cần custom rule)
+├── customize.sh                    # 154 dòng — installer + permission setter
+├── post-fs-data.sh                 # 75 dòng — cooldown early hook + perf-postfs
+├── service.sh                      # 164 dòng — boot apply (perf, spoof, touch360, cooldown)
+├── uninstall.sh                    # 137 dòng — best-effort rollback
+├── common/
+│   ├── stub_cmd.sh                 # 3 dòng — `exit 0` cho logcat/update_engine_sideload
+│   └── stub_daemon.sh              # 11 dòng — sleep loop cho logd/update_engine
+├── bin/
+│   ├── cleanup_ace5_v10_5.sh       # 2 172 dòng — main cleanup engine + WebUI dispatcher
+│   ├── debloat.sh                  # 454 dòng — debloat orchestrator + cooldown/360Hz
+│   ├── debloat_catalog.conf        # 97 dòng — 96 package entry (recommended=36, optional=41, cooldown=19)
+│   ├── aio_performance.sh          # 363 dòng — Game/Charge/Shutdown/Status controller
+│   ├── aio_extreme_generator.sh    # 340 dòng — payload generator XML/TXT từ ROM
+│   ├── aio_game_spoof.sh           # 493 dòng — COPG-compat spoof manager
+│   ├── touch_360_worker.sh         # 214 dòng — daemon 360Hz HIDL + /proc
+│   ├── battery_aio_report_v1.sh    # 649 dòng — WebUI wrapper cho phân tích pin
+│   ├── battery_aio_quick_input_v1.sh   # 154 dòng — quick collector
+│   ├── battery_input_collector_v1_1.sh # 543 dòng — full collector
+│   ├── battery_actor_analyzer_v1_2_2.sh# 878 dòng — analyzer
+│   ├── game_spoof_profiles.conf    # 2 043 B — 13 device profile
+│   ├── game_spoof_targets.conf     # 45 dòng — 43 game package
+│   ├── game_spoof_cpu_blacklist.conf# 287 B — banking/system blacklist
+│   ├── game_spoof_config.json      # 217 dòng — schema v2 + profiles/targets
+│   ├── game_spoof_copg_compat.json # 62 B — template tối thiểu
+│   └── copg_engine/
+│       ├── controller_arm64        # ELF 64-bit AArch64 (150 768 B)
+│       └── controller_armv7        # ELF 32-bit ARM (146 548 B)
+├── zygisk/
+│   ├── arm64-v8a.so                # ELF 64-bit AArch64 (478 240 B)
+│   └── armeabi-v7a.so              # ELF 32-bit ARM (296 644 B)
+└── webroot/
+    ├── index.html                  # 2 216 dòng — UI + inline JS dispatcher
+    └── run.sh                      # 206 dòng — KSU exec bridge</pre>
+
+<h3>Sơ đồ dispatch</h3>
+<pre>KSU WebUI (index.html)
+  └── ksu.exec("sh run.sh --start &lt;mod&gt;")
+        ├── --start clean|modules|boost|dalvik|network|all
+        │     → /system/bin/sh cleanup_ace5_v10_5.sh --module &lt;mod&gt;
+        ├── --start battery-*           → battery_aio_report_v1.sh
+        ├── --start debloat-*           → debloat.sh --*
+        ├── --start performance-*       → aio_performance.sh --*
+        ├── --start performance-spoof-* → aio_game_spoof.sh --enable/--disable
+        └── --start reboot-device       → /system/bin/reboot
+
+Interactive shell (su -c sh cleanup_ace5_v10_5.sh)
+  └── menu loop với 6 module: mod_clean / mod_modules / mod_boost
+                              / mod_dalvik / mod_network_reset / mod_report
+
+Auto / boot path
+  post-fs-data.sh → bind stub → setprop cooldown props
+  service.sh      → wait sys.boot_completed → perf+spoof+touch360+cooldown re-apply</pre>
+</section>
+
+<section id="meta">
+<h2>4. META-INF, module.prop, sepolicy, customize.sh</h2>
+
+<h3>4.1 META-INF</h3>
+<pre>META-INF/com/google/android/updater-script   →  "#MAGISK"
+META-INF/com/google/android/update-binary    →  5 dòng, gọi util_functions.sh → install_module</pre>
+<div class="finding ok">
+<div class="t">OK · Cấu trúc Magisk installer chuẩn</div>
+<div class="meta">META-INF/com/google/android/update-binary:1-5</div>
+<p>Tuân thủ Magisk template; <code>SKIPUNZIP=1</code> để delegate unzip cho <code>util_functions.sh</code>. KSU & APatch đều hiểu format này.</p>
+</div>
+
+<h3>4.2 module.prop</h3>
+<table>
+<thead><tr><th>Field</th><th>Value</th><th>Ghi chú</th></tr></thead>
+<tbody>
+<tr><td>id</td><td>cleanup_ace5_v10_5</td><td>khớp với tên script chính. Không trùng với module phổ biến nào.</td></tr>
+<tr><td>name</td><td>AIO Ace5 V3.0.3 RC</td><td>OK</td></tr>
+<tr><td>version</td><td>v3.0.3RC</td><td><span class="tag low">L-01</span> Tên zip phát hành là <code>v3.0.4RC</code> nhưng module.prop là <code>v3.0.3RC</code> — mismatch versioning.</td></tr>
+<tr><td>versionCode</td><td>30300</td><td>Khớp với 3.0.3, không khớp với tên zip 3.0.4.</td></tr>
+<tr><td>minKernelSU</td><td>11580</td><td>OK — yêu cầu KSU ≥ 11580 (Android 15-class).</td></tr>
+<tr><td>description</td><td>"Debloat, dọn rác, …"</td><td>OK, không có ký tự xấu.</td></tr>
+</tbody>
+</table>
+
+<div class="finding low">
+<div class="t">L-01 · Phiên bản module.prop không khớp tên zip</div>
+<div class="meta">module.prop:3-4 vs file zip "AIO_Ace5_v3.0.4RC.zip"</div>
+<p>Người dùng tải file <code>v3.0.4RC</code> nhưng sau khi cài, module hiển thị <code>v3.0.3RC</code> / <code>versionCode=30300</code>. Trình quản lý update tự động (vd. <code>update.json</code>) sẽ tưởng phiên bản cũ và đề nghị cập nhật ngược.</p>
+<p><b>Khuyến nghị:</b> bump <code>version=v3.0.4RC</code> và <code>versionCode=30400</code> trước khi phát hành.</p>
+</div>
+
+<h3>4.3 sepolicy.rule</h3>
+<pre># intentionally empty: AIO Ace5 currently does not require custom sepolicy rules</pre>
+<div class="finding info">
+<div class="t">INFO · sepolicy.rule rỗng có chủ ý</div>
+<p>Module dùng <code>cmd</code>, <code>pm</code>, <code>resetprop</code> (qua KSU/Magisk magic mount) → không cần SELinux rule custom. <b>Lưu ý:</b> nếu user chạy trên ROM hardened (vd. GrapheneOS-style), một số <code>cmd thermalservice</code> hay <code>cmd appops</code> có thể bị denial. Nên giữ rule rỗng nhưng cảnh báo trong README.</p>
+</div>
+
+<h3>4.4 customize.sh (installer)</h3>
+<div class="finding ok">
+<div class="t">OK · Validation đầy đủ và phân quyền chặt chẽ</div>
+<div class="meta">customize.sh:42-50, 68-100, 114-144</div>
+<p>Installer kiểm tra: SDK ≥ 31 (abort), SDK &lt; 35 (warn), 25 file required phải tồn tại (abort nếu thiếu), và set permission chuẩn: <code>0700</code> cho script chạy được, <code>0600</code>/<code>0644</code> cho config, <code>0750</code>/<code>0755</code> cho directory. Đây là chuẩn vàng cho installer Magisk.</p>
+</div>
+
+<div class="finding low">
+<div class="t">L-02 · Dùng <code>expr</code> để parse SDK int</div>
+<div class="meta">customize.sh:22-23</div>
+<pre>expr "$_sdk" + 0 &gt;/dev/null 2&gt;&amp;1 &amp;&amp; _sdk_int=$(expr "$_sdk" + 0) || true</pre>
+<p><code>expr</code> là legacy và chậm hơn arithmetic expansion. Code hiện đại nên dùng <code>case "$_sdk" in *[!0-9]*) _sdk_int=0 ;; *) _sdk_int="$_sdk" ;; esac</code>. Không phải bug, chỉ là style.</p>
+</div>
+
+<div class="finding low">
+<div class="t">L-03 · Cleanup payload trước khi cài (mong manh)</div>
+<div class="meta">customize.sh:107-109</div>
+<pre>rm -rf "$MODPATH/bin/extreme_gt_payload_generated" 2&gt;/dev/null
+rm -f "$MODPATH/bin/game_max_enabled.flag" "$MODPATH/bin/charge_max_enabled.flag" "$MODPATH/bin/thermal_shutdown_disable.flag" 2&gt;/dev/null</pre>
+<p>Khi update module, các <i>flag-file</i> mà người dùng từng bật sẽ bị xóa, nghĩa là sau update Game Max/Charge Max/Shutdown đều tự động <b>tắt</b>. Đây là quyết định an toàn (chống bootloop sau update), nhưng <b>không tự reapply</b>. Cần đảm bảo README / changelog có note rõ.</p>
+</div>
+</section>
+
+<section id="lifecycle">
+<h2>5. Service lifecycle: post-fs-data.sh / service.sh / uninstall.sh</h2>
+
+<h3>5.1 post-fs-data.sh</h3>
+<div class="finding high">
+<div class="t">H-01 · Bind-mount stub vào /system/bin/logd ở post-fs-data có rủi ro bootloop</div>
+<div class="meta">post-fs-data.sh:36-39</div>
+<pre>bind_file "$STUB_DAEMON" /system/bin/logd
+bind_file "$STUB_CMD"    /system/bin/logcat
+bind_file "$STUB_DAEMON" /system/bin/update_engine
+bind_file "$STUB_CMD"    /system/bin/update_engine_sideload</pre>
+<p><b>Phân tích:</b> Cooldown thay <code>logd</code> bằng stub script chạy <code>while sleep 3600</code>. Trên ColorOS, <code>theia_screen_monitor</code> hoặc <code>oppoCar</code> có thể coi việc logd-restart-loop là điều kiện trigger crash report — chuyển sang stub thì các service kia mất kênh log nhưng <b>không panic</b>. Tuy nhiên:</p>
+<ul>
+<li>Nếu <code>STUB_DAEMON</code> bị xóa (vd. SELinux denial khi tải file ở post-fs phase) thì <code>mount -o bind</code> sẽ fail và logd gốc vẫn chạy → OK.</li>
+<li>Nếu bind <i>thành công</i> nhưng stub bị mất exec permission (<code>set_perm 0700</code> trong customize.sh, nhưng nếu ROM remount /data ro thì bind có thể không apply đúng) → logd start thất bại → init có thể restart liên tục → <b>bootloop ColorOS</b>.</li>
+<li>Gating bằng <code>cooldown_enabled.flag</code> là đúng — chỉ user chủ động bật mới apply.</li>
+</ul>
+<p><b>Khuyến nghị:</b> thêm verify sau <code>bind_file</code>:</p>
+<pre>bind_file "$STUB_DAEMON" /system/bin/logd
+sleep 0.2
+if ! /system/bin/sh /system/bin/logd -h &gt;/dev/null 2&gt;&amp;1; then
+  umount /system/bin/logd 2&gt;/dev/null
+  _log "logd stub verify failed → revert"
+fi</pre>
+<p>(check chỉ là smoke-test, không phải lệnh thật của logd, nhưng nếu shell không exec được thì bind sai → revert ngay).</p>
+</div>
+
+<div class="finding med">
+<div class="t">M-01 · `sleep 1` blocking ở post-fs-data làm chậm boot</div>
+<div class="meta">post-fs-data.sh:34</div>
+<pre>for S in logd logd-auditctl ... ; do ctl_stop "$S"; done
+sleep 1</pre>
+<p>1 giây blocking ở post-fs-data là đáng kể (toàn bộ chain sau đó phải đợi). Một số module khác cũng làm vậy nên user có thể không nhận ra, nhưng nếu kết hợp với 3-4 module có cooldown thì delay cộng dồn.</p>
+<p><b>Khuyến nghị:</b> giảm xuống <code>0.3</code> (mksh hỗ trợ float sleep) hoặc <code>usleep 300000</code> nếu busybox có.</p>
+</div>
+
+<div class="finding low">
+<div class="t">L-04 · `_mount_has` parse `mount` không xử lý mount target có khoảng trắng</div>
+<div class="meta">post-fs-data.sh:16-19, service.sh:31-34, uninstall.sh:18-21</div>
+<pre>mount | awk -v t="$TARGET" '$2==t{found=1} END{exit !found}'</pre>
+<p><code>mount</code> output có format <code>src on target type ...</code>; <code>awk $2</code> sẽ trả về <i>"on"</i> chứ không phải target. Đây là bug typo phổ biến nhưng <b>thực tế</b> trên Android <code>busybox mount</code> output là <code>src target type ...</code> (không có "on") nên <code>$2</code> đúng. Tuy nhiên cấu trúc này không portable giữa toybox/busybox.</p>
+<p><b>Khuyến nghị:</b> parse <code>/proc/self/mountinfo</code> hoặc <code>cat /proc/mounts | awk '{print $2}'</code> để robust hơn:</p>
+<pre>grep -qF " $TARGET " /proc/mounts</pre>
+</div>
+
+<div class="finding med">
+<div class="t">M-02 · Disable ColorOS packages không double-check user 0 trước</div>
+<div class="meta">service.sh:42-46</div>
+<pre>disable_pkg() {
+  PKG="$1"
+  pm path "$PKG" >/dev/null 2>&amp;1 || pm list packages -u 2>/dev/null | grep -qx "package:$PKG" || return 0
+  pm disable-user --user 0 "$PKG" >/dev/null 2>&amp;1 || pm disable --user 0 "$PKG" >/dev/null 2>&amp;1
+}</pre>
+<p>Hợp lý, nhưng:</p>
+<ul>
+<li><code>grep -qx "package:$PKG"</code> sẽ false-negative nếu package có dấu chấm đầu hoặc ký tự đặc biệt (vd. nếu PKG là <code>foo.bar</code>, regex grep <code>-qx</code> dùng fixed string OK).</li>
+<li><code>pm list packages -u</code> liệt kê <b>uninstalled</b> packages. Người ta đã uninstall rồi mà module lại disable thêm — vô hại nhưng dư công.</li>
+</ul>
+</div>
+
+<h3>5.2 service.sh</h3>
+<div class="finding ok">
+<div class="t">OK · Wait sys.boot_completed có timeout 240s</div>
+<div class="meta">service.sh:140-146</div>
+<p>Pattern wait đúng chuẩn: <code>_boot_max=120 * sleep 2</code> = max 240s. Magisk init.rc thường kích service.sh ở <code>late_start</code>, system thường <code>boot_completed</code> trong ~30-60s nên 240s là buffer đủ.</p>
+</div>
+
+<div class="finding med">
+<div class="t">M-03 · Log rotate xóa file cũ &gt; 7 ngày, nhưng đếm _i không dùng</div>
+<div class="meta">service.sh:18-25</div>
+<pre>_i=0
+for _old in /data/local/tmp/aio24_service.log /data/local/tmp/aio25_service_*.log; do
+  [ -f "$_old" ] || continue
+  _i=$((_i+1))
+  _mt=$(stat -c %Y "$_old" 2>/dev/null || printf '0')
+  [ $(( $(date +%s 2>/dev/null || printf '0') - _mt )) -gt 604800 ] && rm -f "$_old" 2>/dev/null
+done</pre>
+<p><code>_i</code> được increment nhưng không dùng cho rotation count. Có vẻ là di sản từ version cũ có giới hạn số file. Không gây bug nhưng dead code.</p>
+</div>
+
+<h3>5.3 uninstall.sh</h3>
+<div class="finding high">
+<div class="t">H-02 · `rm -rf /data/adb/modules/COPG` có thể xóa module bên thứ 3 nếu marker collision</div>
+<div class="meta">uninstall.sh:14-16, 131</div>
+<pre>COPG_COMPAT_DIR="/data/adb/modules/COPG"
+COPG_COMPAT_MARKER="$COPG_COMPAT_DIR/.aio_owned"
+...
+[ -f "$COPG_COMPAT_MARKER" ] && rm -rf "$COPG_COMPAT_DIR" 2>/dev/null</pre>
+<p><b>Phân tích risk:</b></p>
+<ul>
+<li>Marker là một file rỗng tên <code>.aio_owned</code>. Bất kỳ ai (user, module khác, attacker với root) cũng có thể <code>touch /data/adb/modules/COPG/.aio_owned</code> trên một COPG module bên thứ 3.</li>
+<li>Khi user uninstall AIO Ace5 → script xóa cả module COPG bên thứ 3 → user mất module với 0 cảnh báo.</li>
+<li>Trong thực tế attack chain hiếm xảy ra (cần root), nhưng accident chain hoàn toàn có thể: nếu user thử nghiệm với COPG xen kẽ AIO Ace5 nhiều lần, marker có thể tồn tại từ session trước.</li>
+</ul>
+<p><b>Khuyến nghị:</b></p>
+<ol>
+<li>Marker nên là file có <i>nội dung</i> chứa checksum hoặc version, vd. <code>aio_ace5_v303rc_copg_owned_$(date +%s)</code>.</li>
+<li>Check thêm <code>module.prop</code> của COPG dir: nếu <code>id != COPG_AIO_SHIM</code> thì <b>không</b> xóa.</li>
+<li>Hoặc đơn giản: chỉ <code>rm -f</code> các file con AIO biết, không <code>rm -rf</code> cả dir.</li>
+</ol>
+</div>
+
+<div class="finding ok">
+<div class="t">OK · Backup restore qua `debloat_backup.list`</div>
+<div class="meta">uninstall.sh:63-68</div>
+<p>Đọc lại danh sách package đã debloat và <code>pm enable</code> lại từng cái. Đây là pattern best-effort đúng đắn — không bao giờ guarantee restore (vì user có thể đã clear /data) nhưng cố gắng hết sức.</p>
+</div>
+
+<div class="finding low">
+<div class="t">L-05 · Setprop revert ở uninstall không match số lượng đã set ở post-fs-data</div>
+<div class="meta">uninstall.sh:96-108 vs post-fs-data.sh:45-67</div>
+<p>post-fs-data set 22 prop khác nhau; uninstall.sh chỉ revert 13. Các prop chưa revert: <code>persist.sys.preload</code>, <code>persist.sys.monitor</code>, <code>persist.sys.hotstart</code>, <code>persist.sys.fflag.override.settings_enable_monitor_phantom_procs</code>, vài prop OPlus theia/screen_monitor, v.v. Sau uninstall + reboot, các prop này vẫn còn ở giá trị đã setprop.</p>
+<p><b>Lưu ý:</b> các <code>persist.</code> prop sẽ tồn tại qua factory reset nếu /data/property không bị wipe. Một số prop khác như <code>sys.oplus.respreload.vipcsdk.enabled</code> chỉ là runtime → tự reset sau reboot.</p>
+</div>
+</section>
+
+<section id="debloat">
+<h2>6. Debloat module</h2>
+
+<h3>6.1 debloat.sh</h3>
+<div class="finding ok">
+<div class="t">OK · Cấu trúc orchestrator rõ ràng, có dry-run check</div>
+<p>454 dòng, chia thành: catalog loader, backup writer, action dispatch (uninstall / disable / restore), cooldown wrapper, 360Hz worker spawn/stop. Mọi action đều có log + summary counter (OK/WARN/ERR/SKIP).</p>
+</div>
+
+<div class="finding low">
+<div class="t">L-06 · `_cooldown_enable`/`_cooldown_disable` lấy `$1` nhưng không bao giờ được pass arg từ caller</div>
+<div class="meta">debloat.sh:382-394 (shellcheck SC2120)</div>
+<pre>_cooldown_enable() {
+    _quiet="$1"
+    ...
+}</pre>
+<p>Hàm dự định cho phép gọi với chế độ <code>quiet</code> để không in summary. Nhưng các caller trong cùng file (<code>--cooldown-enable</code>) gọi <code>_cooldown_enable</code> không có arg → <code>_quiet</code> luôn rỗng → luôn print summary. Không bug, nhưng feature bị bỏ.</p>
+</div>
+
+<h3>6.2 debloat_catalog.conf</h3>
+<p>97 dòng, <b>96 entry</b> (recommended=36, optional=41, cooldown=19; theo action: uninstall=40, disable=37, cooldown=19). Format ổn định: <code>package|section|action|default|label_vi|description_vi</code>. Đã được mở rộng bởi request trước (đợt 1): thêm 9 app mới vào section <code>recommended/uninstall</code> và <code>optional/disable</code>.</p>
+
+<div class="finding info">
+<div class="t">INFO · Một số entry trùng intent với danh sách hard-coded ở service.sh:98-117</div>
+<p>Các package OPlus statistics, OTA, SAU được catalog liệt kê (action: cooldown) <i>và</i> service.sh disable cứng. Đây là double-defense — nếu user gỡ flag <code>cooldown_enabled</code> thì service.sh không disable nữa. OK nhưng tiềm tàng tăng config drift khi cập nhật.</p>
+</div>
+
+<div class="finding low">
+<div class="t">L-07 · `com.google.android.apps.nbu.files` và `com.google.android.healthconnect.controller` đã tồn tại trong catalog</div>
+<div class="meta">debloat_catalog.conf (đợt sửa trước)</div>
+<p>Trong yêu cầu của user (vòng 1), 2 trong 11 app yêu cầu thêm đã có sẵn — Devin đã đúng khi không thêm lại để tránh duplicate. Đây là behavior chuẩn.</p>
+</div>
+</section>
+
+<section id="cleanup">
+<h2>7. Cleanup engine — cleanup_ace5_v10_5.sh</h2>
+
+<h3>7.1 Tổng quan</h3>
+<p>2 172 dòng — file lớn nhất trong module. Bao gồm: WebUI bridge sender, changelog inline tài liệu hóa hơn 10 vòng audit fix, 6 module function (<code>mod_clean</code>, <code>mod_modules</code>, <code>mod_boost</code>, <code>mod_dalvik</code>, <code>mod_network_reset</code>, <code>mod_report</code>), menu loop tương tác, auto mode, singleton lock với stale detection.</p>
+
+<h3>7.2 Điểm sáng</h3>
+<div class="finding ok">
+<div class="t">OK · TOCTOU defense ở mod_clean</div>
+<div class="meta">cleanup_ace5_v10_5.sh:854-862</div>
+<pre>_tgt_recheck="$(readlink -f "$_raw" 2>/dev/null)"
+if [ -z "$_tgt_recheck" ] || [ "$_tgt_recheck" != "$_tgt" ]; then
+    err "[BLOCKED] Path thay đổi trong lúc xử lý (TOCTOU race): $_raw"
+    continue
+fi</pre>
+<p>Re-resolve path ngay trước <code>rm -rf</code> để phát hiện attacker thay symlink target giữa hai bước check. Đây là code defensive cao cấp, hiếm gặp ở module cộng đồng.</p>
+</div>
+
+<div class="finding ok">
+<div class="t">OK · Singleton lock với stale detection</div>
+<p>Module dùng pid-file lock, kèm check process còn sống không (nếu pid không tồn tại nữa thì coi lock là stale và override). Pattern đúng chuẩn.</p>
+</div>
+
+<div class="finding ok">
+<div class="t">OK · Thermal DPM override với restore-on-interrupt</div>
+<div class="meta">cleanup_ace5_v10_5.sh:442 (và flag /data/local/tmp/aio_thermal_dpm_bypass_active)</div>
+<p>Khi cleanup raise <code>cmd thermalservice override-status</code>, có đặt flag để service.sh boot sau có thể restore. Nếu cleanup bị interrupt giữa chừng (kill -9, reboot), flag không cleared → service.sh detect và restore. Excellent.</p>
+</div>
+
+<h3>7.3 Phát hiện</h3>
+<div class="finding med">
+<div class="t">M-05 · Dead pattern trong case match</div>
+<div class="meta">cleanup_ace5_v10_5.sh:252 (shellcheck SC2221/SC2222)</div>
+<pre>case "$_shtype" in
+    *mksh*|*sh*|*ash*|*dash*) ;;</pre>
+<p><code>*sh*</code> sẽ match <code>mksh</code>, <code>ash</code>, <code>dash</code> nên 3 pattern sau là dead code. Logic vẫn đúng, chỉ thừa.</p>
+</div>
+
+<div class="finding low">
+<div class="t">L-08 · `read -t` không POSIX</div>
+<div class="meta">cleanup_ace5_v10_5.sh:551, 580, 765 (shellcheck SC3045)</div>
+<p>Android shell là mksh-based, hỗ trợ <code>read -t</code> nên thực tế hoạt động OK. Nhưng nếu chạy trên busybox sh strict (rare) sẽ fail. Vì shebang đã <code>/system/bin/sh</code> (= mksh) thì chấp nhận được.</p>
+</div>
+
+<div class="finding low">
+<div class="t">L-09 · Nhiều A && B || C pattern (SC2015)</div>
+<div class="meta">cleanup_ace5_v10_5.sh: 397, 442, 882, 1055, 1234, 1295, 1424, 1453, 1465, 1468, 1473, 1493, 1497, 1526, 1538, 1541, 1546... (≥17 vị trí)</div>
+<p>Pattern <code>cmd &amp;&amp; ok "..." || warn "..."</code>. Vấn đề lý thuyết: nếu <code>ok</code> trả về non-zero (vd. printf bị broken pipe), <code>warn</code> sẽ chạy nhầm. Trong thực tế <code>ok</code>/<code>warn</code> là wrapper printf chắc chắn return 0 → không bug. Code-style note: dùng <code>if cmd; then ok; else warn; fi</code> sẽ rõ hơn.</p>
+</div>
+
+<div class="finding low">
+<div class="t">L-10 · `read` không có `-r` (SC2162)</div>
+<p>Backslash trong input bị mangle. Nhưng input ở đây là output <code>df</code>, không có backslash → không bug thực tế.</p>
+</div>
+</section>
+
+<section id="perf">
+<h2>8. Performance + Extreme Generator + Touch 360Hz</h2>
+
+<h3>8.1 aio_performance.sh</h3>
+<div class="finding ok">
+<div class="t">OK · Snapshot trước modify, restore-on-disable</div>
+<p>Charge state được snapshot vào <code>charge_max_state/</code> trước khi modify; <code>--charge-disable</code> revert đúng từ snapshot. Game Max dùng <code>emul_temp</code> emulation thay vì force-frequency → an toàn hơn.</p>
+</div>
+
+<div class="finding med">
+<div class="t">M-06 · Dead pattern trong thermal zone matcher</div>
+<div class="meta">aio_performance.sh:160 (shellcheck SC2221/SC2222)</div>
+<pre>batt-therm|usb-therm|*batt*|*battery*|*usb*|*charger*|*chg*|*vbus*|*connector*|*charge*)</pre>
+<p><code>*batt*</code> match <code>batt-therm</code>, <code>*usb*</code> match <code>usb-therm</code>. Dead code 2 pattern đầu. Không bug.</p>
+</div>
+
+<div class="finding med">
+<div class="t">M-11 · Sạc Max ghi force_active/force_val vào /proc/oplus-votable</div>
+<div class="meta">aio_performance.sh:112-145, 178-184 — <i>raise từ "OK" sau khi đối chiếu GPT</i></div>
+<p><b>Đánh giá lại:</b> rev 1.0 của báo cáo này ghi "OK · Không force-write current/voltage" — đúng ở chỗ không ép <code>current_now</code> hay <code>charge_control_limit</code> trực tiếp, nhưng <b>bỏ sót</b> việc <code>apply_charge_power_hints</code> ghi cả <code>force_active=1</code> và <code>force_val=0</code> vào 9 votable:</p>
+<pre>for v in CHG_DISABLE CHARGE_DISABLE USB_SUSPEND INPUT_SUSPEND SMART_CHG_DISABLE SLOW_CHG_DISABLE COOL_DOWN COOLDOWN COOL_DOWN_VOTER; do
+  d="/proc/oplus-votable/$v"
+  [ -e "$d/force_val" ]    &amp;&amp; _write_node_log "$d/force_val"    0 "votable-$v"
+  [ -e "$d/force_active" ] &amp;&amp; _write_node_log "$d/force_active" 1 "votable-$v"
+done</pre>
+<p>Ngoài ra, <code>GAUGE_UPDATE</code> bị set <code>force_val=1000</code> + <code>force_active=1</code> (line 181-182). Đây là override <i>charging-disable / cooldown / gauge-update votable</i> — không phải force current/voltage thô, nhưng vẫn ảnh hưởng charging logic. Semantics của các votable này có thể lệch giữa minor version ColorOS / kernel patches; sai assume có thể giảm tốc sạc bất thường, sạc-nhưng-không-vào-pin, hoặc trigger telemetry charging error.</p>
+<p><b>Mitigation:</b> có snapshot trước modify (<code>charge_max_state/</code>) và restore-on-disable. Cũng có log mọi node thay đổi qua <code>_write_node_log</code>.</p>
+<p><b>Khuyến nghị:</b> thêm dry-run/list-node mode, document chính xác từng votable bị set ý nghĩa gì, không mở rộng sang FCC/USB_ICL/FV/CHARGER_VOLTAGE/CHARGER_CURRENT (hiện chỉ log để debug — giữ nguyên).</p>
+</div>
+
+<div class="finding med">
+<div class="t">M-12 · Shutdown thermal disable: rủi ro hardware cao dù có 2-step arm/confirm</div>
+<div class="meta">aio_performance.sh:299-330, bind_shutdown / SHUTDOWN_FLAG — <i>tách finding riêng sau khi đối chiếu GPT</i></div>
+<p><b>Pattern hiện tại:</b> <code>--shutdown-arm</code> tạo file <code>SHUTDOWN_ARM_FILE</code> với TTL 120s + in WARNING tiếng Việt; <code>--shutdown-confirm</code> kiểm tra age &lt;= TTL rồi mới <code>touch SHUTDOWN_FLAG</code> + <code>bind_shutdown</code>. Sau reboot, <code>service.sh</code> sẽ re-apply nếu flag còn.</p>
+<p><b>Rủi ro thực:</b></p>
+<ul>
+<li>Bản chất feature là bind overlay <code>high_temp</code> để vô hiệu/giảm logic thermal shutdown của ROM. Nếu payload generated sai (parsing XML lệch, schema mới), kernel vẫn shutdown nhưng userspace nghĩ đã disable → false confidence.</li>
+<li>Nếu bật lâu dài, máy mất safety net cuối cùng để tự ngắt khi quá nóng → có thể hại pin, hại die SoC, hoặc gây thermal-runaway trong game session dài.</li>
+<li>Flag <i>persistent</i> qua reboot (không auto-expire). User có thể quên đã bật.</li>
+</ul>
+<p><b>Khuyến nghị:</b> (a) mặc định OFF + cảnh báo UI rõ hơn (đã có một phần); (b) auto-expire flag sau N phút sử dụng hoặc sau 1 reboot — nếu user vẫn muốn dùng thì arm lại; (c) thêm watchdog kiểm tra temp sensor: nếu &gt;= 50°C trong &gt;= 30s thì tự bỏ disable.</p>
+</div>
+
+<div class="finding ok">
+<div class="t">OK · Không force-write trực tiếp current_now / charge_control_limit</div>
+<p>Mặc dù M-11 đã raise vấn đề votable writes, vẫn ghi nhận điểm tích cực: không có direct write vào các node nguy hiểm hơn như <code>current_now</code>, <code>charge_control_limit</code>, hay <code>constant_charge_current_max</code>. Charge controller hardware vẫn là last-line-of-defense.</p>
+</div>
+
+<h3>8.2 aio_extreme_generator.sh</h3>
+<div class="finding ok">
+<div class="t">OK · XML validation trước khi accept patched file</div>
+<p>Sau khi sed-patch XML, generator validate format (đếm tag mở/đóng) trước khi commit. Skip XML minified vì unsafe.</p>
+</div>
+
+<div class="finding med">
+<div class="t">M-07 · Biến `DENY_CN` declared nhưng không dùng</div>
+<div class="meta">aio_extreme_generator.sh:23 (shellcheck SC2034)</div>
+<p>Dead variable, có vẻ là remnant từ version cũ. Không bug.</p>
+</div>
+
+<div class="finding low">
+<div class="t">L-11 · Shellcheck SC1087 false-positive cho `[^&gt;]*`</div>
+<div class="meta">aio_extreme_generator.sh:244, 247</div>
+<pre>sed "s#&lt;$key[^&gt;]*/&gt;#&lt;$key booleanVal=\"false\" /&gt;#g" "$dst"</pre>
+<p>Shellcheck nhầm <code>$key[^&gt;]*</code> là array index. POSIX sh không có array nên <code>$key</code> expand bình thường, <code>[^&gt;]*</code> là char class literal sed nhận → đúng intention. Có thể đổi sang <code>${key}[^&gt;]*</code> để shellcheck im (cosmetic).</p>
+</div>
+
+<h3>8.3 touch_360_worker.sh</h3>
+<div class="finding ok">
+<div class="t">OK · Multi-fallback HIDL + /proc</div>
+<p>Thử cả HAL binary <code>touchHidlTest</code> với 3 cách (write-only / write-blob / write-string) và direct /proc node — robust với nhiều firmware version. Re-apply mỗi 6s nếu flag vẫn còn.</p>
+</div>
+
+<div class="finding low">
+<div class="t">L-12 · Tốn pin nhẹ vì loop 6s + write 4 nodes</div>
+<p>Daemon ngủ 6s rồi write 4 HIDL node + 4 /proc node = ~8 syscall mỗi 6s = ~80 syscall/phút. Trên SM8650 không đo được nhưng <b>không đáng kể</b>. Chỉ nên ghi note.</p>
+</div>
+</section>
+
+<section id="spoof">
+<h2>9. Game Spoof (Zygisk + COPG engine)</h2>
+
+<h3>9.1 aio_game_spoof.sh</h3>
+<div class="finding ok">
+<div class="t">OK · Validation chặt package + profile ID</div>
+<div class="meta">aio_game_spoof.sh:40-52</div>
+<pre>_valid_pkg(){
+    case "$1" in
+        ''|*[!A-Za-z0-9_.]*) return 1 ;;
+        *) return 0 ;;
+    esac
+}
+_valid_id(){
+    case "$1" in
+        ''|*[!A-Za-z0-9_]* ) return 1 ;;
+        *) return 0 ;;
+    esac
+}</pre>
+<p>Block mọi ký tự đặc biệt trước khi pass vào lệnh shell — chống injection. Pattern chuẩn.</p>
+</div>
+
+<div class="finding med">
+<div class="t">M-08 · Detect external COPG module và merge khá phức tạp</div>
+<p>Logic detect <code>/data/adb/modules/COPG</code> và shim overlay là chính xác nhưng phức tạp. Đường vào H-02 (xóa nhầm COPG dir khi uninstall) bắt nguồn từ feature này.</p>
+</div>
+
+<div class="finding low">
+<div class="t">L-13 · Biến `COPG_ZYGISK_ARMV7` không dùng</div>
+<div class="meta">aio_game_spoof.sh:28 (shellcheck SC2034)</div>
+<p>Có vẻ định dùng cho 32-bit shim nhưng chưa wire. Dead variable.</p>
+</div>
+
+<h3>9.2 Config files</h3>
+<div class="finding med">
+<div class="t">M-04 · Absolute path build-environment leak trong game_spoof_config.json</div>
+<div class="meta">game_spoof_config.json:25</div>
+<pre>"cpuinfo_file": "/mnt/data/aio_fix6_work/bin/game_spoof_cpuinfo.txt"</pre>
+<p>Path này là build-environment của tác giả gốc. Sau <code>aio_game_spoof.sh --enable</code> sẽ rewrite thành <code>$BIN_DIR/game_spoof_cpuinfo.txt</code> (đúng), nhưng:</p>
+<ul>
+<li>Trong "as shipped" JSON, path không tồn tại trên thiết bị thật.</li>
+<li>Nếu reverse engineer / user nào đọc raw config sẽ confused.</li>
+<li>Nếu code path bypass <code>--enable</code> (vd. zygisk SO đọc trực tiếp) thì sẽ fail silently.</li>
+</ul>
+<p><b>Khuyến nghị:</b> ship sẵn JSON với placeholder rõ ràng:</p>
+<pre>"cpuinfo_file": "$MODPATH/bin/game_spoof_cpuinfo.txt"</pre>
+<p>hoặc dùng marker <code>__BIN_DIR__</code> để script rewrite an toàn hơn.</p>
+</div>
+
+<h3>9.3 game_spoof_targets.conf</h3>
+<table>
+<thead><tr><th>Stat</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>Số game</td><td>43</td></tr>
+<tr><td>Game blocked CPU (an toàn nhất)</td><td>40</td></tr>
+<tr><td>Game cpu_only (cảnh báo ban app)</td><td>2 (Fortnite, Farlight 84)</td></tr>
+<tr><td>Profile được map nhiều nhất</td><td>REDMAGIC_9_PRO (18 game)</td></tr>
+</tbody>
+</table>
+<div class="finding ok">
+<div class="t">OK · Profile mapping hợp lý</div>
+<p>Các tựa thuộc nhóm <i>strict device-check</i> như PUBG, Wild Rift, MLBB, FC Mobile được map sang flagship phổ biến đúng (Xiaomi 13 Pro, OnePlus 8 Pro, Galaxy Z Fold5). RedMagic 10 Pro được map cho CODM/Wuthering Waves là choice tốt cho gaming-class.</p>
+</div>
+</section>
+
+<section id="battery">
+<h2>10. Battery analysis subsystem</h2>
+
+<h3>10.1 battery_aio_quick_input_v1.sh</h3>
+<div class="finding ok">
+<div class="t">OK · Tránh logcat hoàn toàn, dùng dumpsys + sysfs</div>
+<p>Quick collector chỉ 154 dòng, có progress reporting, có background timeout cho <code>dumpsys batterystats --charged</code> (60s), <code>dumpsys jobscheduler</code> (25s)... Output redacted (skip GPS coordinate).</p>
+</div>
+
+<div class="finding low">
+<div class="t">L-14 · `dump_sysfs_dir` allow-list 12 file cụ thể, có thể bỏ sót OEM-specific</div>
+<div class="meta">battery_aio_quick_input_v1.sh:104</div>
+<p>Trên ColorOS SM8650, có thêm <code>battery_authenticate</code>, <code>fastchg_type</code>, <code>quick_charge_type</code>... mà allowlist không bao gồm. Không bug nhưng có thể thiếu data debugging.</p>
+</div>
+
+<h3>10.2 battery_input_collector_v1_1.sh</h3>
+<div class="finding ok">
+<div class="t">OK · Tự re-exec via su nếu chưa root</div>
+<div class="meta">battery_input_collector_v1_1.sh:68-71</div>
+<p>Phát hiện UID không phải 0 → <code>exec su -c "sh '$0' '$1'"</code>. UX tốt, không yêu cầu user phải <code>su</code> trước.</p>
+</div>
+
+<div class="finding low">
+<div class="t">L-15 · `exec su -c "sh '$0' '$1'"` không escape `$0`/`$1` nếu chứa quote</div>
+<p>Cực hiếm xảy ra (filename có dấu nháy), nhưng nếu user save vào <code>/sdcard/'evil.sh</code> thì sẽ broken. Low risk.</p>
+</div>
+
+<h3>10.3 battery_actor_analyzer_v1_2_2.sh</h3>
+<div class="finding ok">
+<div class="t">OK · CPU-first scoring chống false-positive</div>
+<p>Comment đầu file ghi rõ <i>"CPU-first scoring to avoid false suspects from package-name prefixes. Exact package token extraction, not prefix grep"</i> — design quality cao.</p>
+</div>
+
+<div class="finding info">
+<div class="t">INFO · Phân tích chỉ chạy 1 lần per input file, không cumulative</div>
+<p>Mỗi input file → 1 analysis report. Không có cơ chế trend across sessions. Acceptable cho v1.</p>
+</div>
+
+<h3>10.4 battery_aio_report_v1.sh</h3>
+<div class="finding med">
+<div class="t">M-09 · `COLLECTOR` biến declared nhưng có vẻ chỉ dùng cho fallback path không có</div>
+<div class="meta">battery_aio_report_v1.sh:11 (shellcheck SC2034)</div>
+<p>Đường code thực tế dùng <code>QUICK_INPUT</code> trước, <code>COLLECTOR</code> không được tham chiếu sau đó. Có thể là di sản từ design "fallback to full collector if quick fails".</p>
+</div>
+</section>
+
+<section id="webui">
+<h2>11. WebUI: index.html + run.sh bridge</h2>
+
+<h3>11.1 webroot/run.sh</h3>
+<div class="finding ok">
+<div class="t">OK · Allowlist module name + valid SID format</div>
+<div class="meta">webroot/run.sh:43, 86-94</div>
+<p>SID format strict: <code>case ... in ''|*[!0-9_]*|*_*_*) return 1 ;; *_*) return 0;; esac</code> — chỉ chấp nhận <code>&lt;digits&gt;_&lt;digits&gt;</code>. Module name match allowlist 30+ giá trị, default rejected. Path injection vào <code>$_mod</code> bị block.</p>
+</div>
+
+<div class="finding ok">
+<div class="t">OK · Cleanup stale temp files &gt; 30 phút</div>
+<div class="meta">webroot/run.sh:102-106</div>
+<p>Mỗi lần <code>--start</code> sẽ scan <code>${_TMP_BASE}_*</code> và xóa file &gt;1800s. Tránh tích tụ rác.</p>
+</div>
+
+<div class="finding med">
+<div class="t">M-10 · Default case route unknown mod vào main script</div>
+<div class="meta">webroot/run.sh:135</div>
+<pre>*) /system/bin/sh "$_MAIN_SCRIPT" --module "$_mod" ;;</pre>
+<p>Đây là dead branch trên thực tế (đã có allowlist check trước đó ở line 86-94 sẽ exit), nhưng nếu refactor xảy ra mà quên copy allowlist thì default case này sẽ pass mod-name không validated cho main script với arg <code>--module</code>. Main script có validation riêng nên không thành critical, nhưng <b>defense-in-depth</b> nên đổi default thành <code>printf "[ERR] unreachable\n"; exit 99</code>.</p>
+</div>
+
+<div class="finding low">
+<div class="t">L-16 · `*sh*` overrides `*run.sh*` trong _pid_belongs_to_session</div>
+<div class="meta">webroot/run.sh:49 (shellcheck SC2221)</div>
+<pre>case "$_cmd" in *sh*|*run.sh*|*"$_mod"*|*"$_sid"*) return 0 ;; esac</pre>
+<p><code>*sh*</code> đã match tất cả → 3 pattern sau dead. Logic vẫn đúng (cho phép terminate). Có thể bị abuse nếu attacker giả dạng process tên "sh" trong cùng UID — nhưng KSU exec chạy như root nên scope là module's own background processes → an toàn.</p>
+</div>
+
+<h3>11.2 webroot/index.html</h3>
+<div class="finding ok">
+<div class="t">OK · esc() escape `&amp;`, `&lt;`, `&gt;` trước khi innerHTML</div>
+<div class="meta">webroot/index.html:1533</div>
+<pre>function esc(s){return String(s??'').replace(/[&amp;&lt;&gt;]/g,c=&gt;({'&amp;':'&amp;amp;','&lt;':'&amp;lt;','&gt;':'&amp;gt;'}[c]))}</pre>
+<p>Đủ cho element-content context (không phải attribute context). 8 vị trí <code>innerHTML</code> đều route qua <code>esc()</code> hoặc string literal cứng → không có XSS sink khai thác được từ output script.</p>
+</div>
+
+<div class="finding ok">
+<div class="t">OK · Không có eval/Function/document.write/insertAdjacentHTML</div>
+<p>Grep confirm: 0 hit.</p>
+</div>
+
+<div class="finding info">
+<div class="t">INFO · Không có CSP meta tag</div>
+<p>WebUI dựa hoàn toàn vào isolation của KSU webroot:// scheme. Không có <code>&lt;meta http-equiv="Content-Security-Policy"&gt;</code>. Bằng cách thêm:</p>
+<pre>&lt;meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'"&gt;</pre>
+<p>sẽ bổ sung defense-in-depth chống XSS injection nếu trong tương lai có sink mới.</p>
+</div>
+
+<div class="finding info">
+<div class="t">INFO · KSU JS bridge dynamic import có fallback</div>
+<div class="meta">webroot/index.html:1752-1755</div>
+<p>Code import <code>/kernelsu</code> module trước, fallback sang global <code>ksu.exec(cmd,'{}',cb)</code> callback nếu module không hỗ trợ ES module → tương thích cả KSU mới (module-based) và cũ (global object). Tốt.</p>
+</div>
+
+<div class="finding low">
+<div class="t">L-17 · Timeout battery-run là 6 phút (1200 empty polls × 0.3s), 30s cho mọi command khác</div>
+<div class="meta">webroot/index.html:1790-1792</div>
+<p>Battery collection có thể chạy &gt;5 phút trên máy nhiều app, 6 phút có thể chưa đủ. Cleanup full mode (mod=all) cũng &lt;30s cho idle polls nhưng nếu user có nhiều dữ liệu rác có thể timeout. Tham số nên hiển thị cho user thấy đang chờ tiến trình thay vì cancel.</p>
+</div>
+</section>
+
+<section id="binaries">
+<h2>12. Binary metadata</h2>
+<table>
+<thead><tr><th>File</th><th>Size</th><th>ELF class</th><th>Arch (e_machine)</th><th>Note</th></tr></thead>
+<tbody>
+<tr><td><code>zygisk/arm64-v8a.so</code></td><td>478 240 B</td><td>ELF64</td><td>0xB7 = AArch64</td><td>OK</td></tr>
+<tr><td><code>zygisk/armeabi-v7a.so</code></td><td>296 644 B</td><td>ELF32</td><td>0x28 = ARM</td><td>OK</td></tr>
+<tr><td><code>bin/copg_engine/controller_arm64</code></td><td>150 768 B</td><td>ELF64</td><td>0xB7 = AArch64</td><td>OK</td></tr>
+<tr><td><code>bin/copg_engine/controller_armv7</code></td><td>146 548 B</td><td>ELF32</td><td>0x28 = ARM</td><td>OK</td></tr>
+</tbody>
+</table>
+<div class="finding info">
+<div class="t">INFO · Binary content không được audit động</div>
+<p>Trong môi trường sandbox này không thể RE binary để xác nhận behavior. Khuyến nghị tác giả cung cấp:</p>
+<ul>
+<li>Source code public hoặc commit hash cho Zygisk SO.</li>
+<li>SHA256 checksum trong release note.</li>
+<li>Nếu Zygisk SO làm <code>resetprop</code>-style hook, document đầy đủ properties bị spoof.</li>
+</ul>
+</div>
+<div class="finding low">
+<div class="t">L-18 · Binary not stripped khả năng cao</div>
+<p>Size 478KB cho 1 Zygisk hook tương đối lớn — có thể chưa <code>strip</code>. Strip sẽ giảm dung lượng + làm khó RE nếu là concern.</p>
+</div>
+</section>
+
+<section id="cross">
+<h2>13. Cross-cutting findings & shellcheck rollup</h2>
+
+<h3>13.1 Shellcheck summary (warning-level, 17 file)</h3>
+<table>
+<thead><tr><th>File</th><th>Warnings</th><th>Severity dominant</th></tr></thead>
+<tbody>
+<tr><td>cleanup_ace5_v10_5.sh</td><td>~25 (dead pattern, read -t, A&amp;&amp;B||C)</td><td>info/low</td></tr>
+<tr><td>aio_performance.sh</td><td>2 (dead pattern)</td><td>info</td></tr>
+<tr><td>aio_extreme_generator.sh</td><td>3 (DENY_CN unused, SC1087 fp)</td><td>info</td></tr>
+<tr><td>aio_game_spoof.sh</td><td>1 (COPG_ZYGISK_ARMV7 unused)</td><td>info</td></tr>
+<tr><td>debloat.sh</td><td>2 (SC2120 functions)</td><td>info</td></tr>
+<tr><td>battery_aio_report_v1.sh</td><td>1 (COLLECTOR unused)</td><td>info</td></tr>
+<tr><td>customize.sh</td><td>1 (SKIPUNZIP false positive)</td><td>info</td></tr>
+<tr><td>webroot/run.sh</td><td>1 (dead pattern)</td><td>info</td></tr>
+<tr><td>Mọi file khác</td><td>0 warning</td><td>—</td></tr>
+</tbody>
+</table>
+
+<h3>13.2 Cross-cutting concerns</h3>
+<div class="finding info">
+<div class="t">INFO · Sử dụng `/system/bin/sh` (mksh) thay vì busybox sh nhất quán</div>
+<p>Mọi shebang đều là <code>#!/system/bin/sh</code>. Đây là mksh trên Android — hỗ trợ <code>read -t</code>, hỗ trợ <code>[[ ]]</code>, hỗ trợ arithmetic <code>$((...))</code>. Module tránh được nhiều vấn đề POSIX strict.</p>
+</div>
+
+<div class="finding info">
+<div class="t">INFO · Nhất quán xử lý lỗi & log</div>
+<p>Mọi script đều có <code>set +e</code> (không exit on error) → khả năng tự rollback và log lý do thất bại từng bước. Tradeoff: lỗi silent hơn, nhưng user thấy progress đến cuối thay vì abort giữa chừng.</p>
+</div>
+
+<div class="finding info">
+<div class="t">INFO · Flag-file gating chống bootloop</div>
+<p>Mọi feature persistent (cooldown, game_max, charge_max, touch360, thermal_shutdown_disable, game_spoof) đều gate bằng flag-file trong <code>$MODPATH/bin/*.flag</code>. customize.sh xóa các flag khi update → safe-by-default sau update.</p>
+</div>
+
+<div class="finding info">
+<div class="t">INFO · Tránh hardcode đường dẫn user</div>
+<p>Hầu hết script dùng <code>readlink -f "$0"</code> để self-locate → không phụ thuộc ID module hardcoded. Exception duy nhất: <code>game_spoof_config.json:25</code> có path leak (M-04).</p>
+</div>
+
+<div class="finding info">
+<div class="t">INFO · Không có unit test / sandbox test</div>
+<p>Module không kèm test suite. Mỗi thay đổi phải test thủ công trên thiết bị thật. Đây là chuẩn cho module Magisk nhưng đáng note.</p>
+</div>
+</section>
+
+<section id="recs">
+<h2>14. Khuyến nghị tổng hợp</h2>
+
+<h3>14.1 Phải xử lý trước release tiếp theo</h3>
+<ol>
+<li><b>L-01:</b> Bump <code>version</code>/<code>versionCode</code> trong <code>module.prop</code> cho khớp tên zip phát hành (v3.0.4RC / 30400).</li>
+<li><b>H-01:</b> Thêm fallback verify cho bind-mount stub vào <code>logd</code>/<code>update_engine</code> ở <code>post-fs-data.sh</code>; nếu fail thì <code>umount</code> ngay để revert về daemon gốc và log lý do.</li>
+<li><b>H-02:</b> Đổi marker COPG-shim từ file rỗng sang file có nội dung checksum/version + verify <code>module.prop</code> trước khi <code>rm -rf</code>. Hoặc bỏ <code>rm -rf</code> và chỉ <code>rm</code> các file con AIO biết.</li>
+<li><b>M-04:</b> Sửa <code>game_spoof_config.json:25</code> để không chứa absolute path build-environment.</li>
+</ol>
+
+<h3>14.2 Nên xử lý sớm (chất lượng)</h3>
+<ol>
+<li><b>M-01:</b> Giảm <code>sleep 1</code> ở post-fs-data xuống <code>0.3s</code> để rút ngắn boot.</li>
+<li><b>M-02:</b> <code>disable_pkg</code> nên loại bỏ check <code>pm list packages -u</code> với uninstalled package.</li>
+<li><b>M-03:</b> Xóa biến <code>_i</code> dead trong service.sh log-rotate.</li>
+<li><b>M-05/M-06/L-16:</b> Dọn dead pattern (<code>*sh*</code> đứng trước các literal hẹp hơn trong case).</li>
+<li><b>M-07/L-13/M-09:</b> Xóa unused variables (<code>DENY_CN</code>, <code>COPG_ZYGISK_ARMV7</code>, <code>COLLECTOR</code>).</li>
+<li><b>M-10:</b> Default case trong run.sh nên fail explicit thay vì fallback.</li>
+<li><b>L-05:</b> Bổ sung revert prop cho 9 prop hiện thiếu trong uninstall.sh.</li>
+</ol>
+
+<h3>14.3 Đề xuất cải tiến dài hạn</h3>
+<ol>
+<li>Thêm <code>&lt;meta http-equiv="Content-Security-Policy"&gt;</code> vào WebUI.</li>
+<li>Public source / commit hash + SHA256 cho 4 ELF binary.</li>
+<li>Strip Zygisk SO để giảm dung lượng.</li>
+<li>Migrate <code>mount | awk</code> sang <code>grep -qF " $T " /proc/mounts</code>.</li>
+<li>Convert pattern <code>cmd &amp;&amp; ok || warn</code> sang explicit <code>if/then/else</code> để dễ debug.</li>
+<li>Thêm test harness shell (kể cả ở dạng dry-run) cho 6 module chính của cleanup script.</li>
+<li>Phân tích pin: thêm option trend-across-sessions để so sánh idle drain qua thời gian.</li>
+<li>Tăng timeout WebUI cho cleanup mode <code>all</code> trên thiết bị có nhiều /data (hoặc dynamic timeout dựa trên storage size).</li>
+</ol>
+
+<h3>14.4 Điểm mạnh nên giữ</h3>
+<ul>
+<li>TOCTOU defense ở mod_clean (cleanup_ace5_v10_5.sh:854).</li>
+<li>Singleton lock + stale detection.</li>
+<li>Thermal DPM restore-on-interrupt.</li>
+<li>Backup catalog cho restore (debloat_backup.list).</li>
+<li>esc() XSS prevention trong WebUI.</li>
+<li>Flag-file gating chống bootloop.</li>
+<li>Bind-mount stub thay vì kill daemon (rollback-friendly).</li>
+<li>Path canonicalization với <code>readlink -f</code>.</li>
+<li>Package/profile ID validation chặt chẽ trong game_spoof.</li>
+<li>Charge state snapshot trước khi modify.</li>
+</ul>
+</section>
+
+<section>
+<h2>15. Kết luận</h2>
+<p>AIO Ace5 v3.0.3RC là module Magisk/KernelSU/APatch <b>chất lượng trên trung bình</b> so với cộng đồng Việt — cấu trúc rõ, defensive coding ở nhiều chỗ, có rollback path. Không phát hiện lỗ hổng critical khai thác được trong static review. Hai phát hiện <span class="tag high">High</span> đều có điều kiện kích hoạt cụ thể (bind-fail edge case và marker collision) và có thể fix với thay đổi nhỏ. Phần còn lại là code quality / packaging hygiene.</p>
+
+<p><b>Verdict:</b> đủ an toàn để cài trên thiết bị <i>cá nhân</i>. Trước khi đẩy lên public release lớn (Github / channel rộng), nên xử lý 4 mục ở 14.1.</p>
+
+<p class="smallnote">Báo cáo được tạo bằng static analysis trên 33 file (<b>7 015 LOC shell</b> + 2 216 LOC WebUI + 4 ELF binary, tổng 9 231 LOC text), shellcheck v0.8.0, grep ripgrep, đọc thủ công 100% script và config text. Audit không bao gồm dynamic testing trên ColorOS 15-16 thực tế.</p>
+
+<hr>
+<h3>Phụ lục A · Changelog báo cáo</h3>
+<table>
+<thead><tr><th>Rev</th><th>Ngày</th><th>Thay đổi</th></tr></thead>
+<tbody>
+<tr><td>1.0</td><td>2026-05-13</td><td>Audit gốc 33 file. Phát hành finding ban đầu: 0 Crit · 2 High · 9 Med · 14 Low · 11 Info.</td></tr>
+<tr><td>1.1</td><td>2026-05-13</td><td>Cập nhật sau đối chiếu với báo cáo độc lập của GPT:
+<ul style="margin:6px 0 0 18px">
+<li>Sửa số liệu shell LOC: <code>9 226 → 7 015</code> (số 9 226 cũ đã gồm cả webroot/index.html).</li>
+<li>Sửa số entry catalog: <code>~95 → 96</code> (recommended=36, optional=41, cooldown=19).</li>
+<li><b>M-11 mới</b>: raise "Sạc Max votable writes" từ OK lên MED — GPT chỉ ra đúng rằng <code>force_active</code>/<code>force_val</code> ghi vào 9 votable + GAUGE_UPDATE vẫn là rủi ro vận hành dù không force current/voltage trực tiếp.</li>
+<li><b>M-12 mới</b>: tách "Shutdown thermal disable" thành finding MED riêng — rev 1.0 chỉ note nhẹ trong M-04 charge state; rev 1.1 đánh giá đây là feature rủi ro hardware cao nhất trong module.</li>
+<li>KPI Medium: 9 → 11.</li>
+</ul></td></tr>
+</tbody>
+</table>
+
+<h3>Phụ lục B · Đối chiếu Devin ↔ GPT</h3>
+<table>
+<thead><tr><th>Chủ đề</th><th>Devin rev 1.0</th><th>GPT independent</th><th>Devin rev 1.1 (sau đối chiếu)</th></tr></thead>
+<tbody>
+<tr><td>Version mismatch v3.0.3RC vs zip 3.0.4RC</td><td>L-01</td><td>F-01 (High)</td><td>L-01 — đã hi-light trong Top-3</td></tr>
+<tr><td>COPG marker collision khi uninstall</td><td>H-02</td><td>F-02 (High)</td><td>H-02 — khớp</td></tr>
+<tr><td>Bind stub logd/update_engine không verify</td><td>H-01</td><td>F-03 (Med)</td><td>H-01 — giữ High; GPT's Med cũng defensible vì gating bởi opt-in flag</td></tr>
+<tr><td>/mnt/data path leak JSON</td><td>M-04</td><td>F-04 (Med)</td><td>M-04 — khớp</td></tr>
+<tr><td>Sạc Max votable writes</td><td>"OK"</td><td>F-05 (Med)</td><td><b>M-11 (mới, raise lên Med)</b></td></tr>
+<tr><td>Shutdown thermal disable</td><td>chỉ note nhẹ</td><td>F-06 (Med)</td><td><b>M-12 (mới, tách finding Med)</b></td></tr>
+<tr><td>uninstall.sh thiếu revert prop</td><td>L-05</td><td>F-07 (Med)</td><td>L-05 — Devin xếp Low; có thể nâng Med sau</td></tr>
+<tr><td>mount parse không nhất quán</td><td>L-04</td><td>F-08 (Low)</td><td>L-04 — khớp</td></tr>
+<tr><td>WebUI XSS / CSP defense-in-depth</td><td>OK + INFO</td><td>F-09 (Low)</td><td>khớp</td></tr>
+<tr><td>run.sh default branch fallback</td><td>M-10</td><td>F-10 (Low)</td><td>M-10 — Devin xếp Med, GPT Low — defensible cả hai</td></tr>
+<tr><td>Devin số liệu sai (LOC, catalog)</td><td>—</td><td>F-11</td><td><b>đã sửa trong rev 1.1</b></td></tr>
+<tr><td>Shell syntax / JSON / ELF metadata pass</td><td>OK rải rác</td><td>F-12 (Info, tổng hợp)</td><td>khớp</td></tr>
+</tbody>
+</table>
+<p class="smallnote">Tổng kết đối chiếu: cả hai báo cáo nhất trí về <b>4 release-blocker</b>. GPT chính xác hơn về 2 số liệu và 2 finding charging/thermal. Devin rộng hơn về low/info findings (shellcheck rollup, dead patterns). Rev 1.1 đã hấp thụ corrections từ GPT.</p>
+</section>
+
+</div>
+</body>
+</html>

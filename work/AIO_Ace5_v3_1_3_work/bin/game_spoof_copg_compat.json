@@ -1,0 +1,3 @@
+{
+  "cpu_spoof": {"blacklist": [], "cpu_only_packages": []}
+}

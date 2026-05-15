@@ -1,0 +1,7 @@
+id=cleanup_ace5_v10_5
+name=AIO Ace5 V3.1
+version=v3.1.3
+versionCode=31300
+author=@keobamien
+description=Debloat, dọn rác, phân tích pin và Hiệu năng V3.1.1 với bảng công tắc nhanh: 360Hz, Game Max + Spoof, Sạc Max, Shutdown nhiệt, Nhà phát triển, Gỡ lỗi USB.
+minKernelSU=11580

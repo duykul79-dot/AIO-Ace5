@@ -1,0 +1,33 @@
+﻿# Windows / editor
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*.tmp
+*.bak
+*.old
+*.orig
+
+# Logs / temp
+*.log
+tmp/
+temp/
+pack_tmp*/
+verify_zip_tmp*/
+_trash_review*/
+
+# Build junk
+__MACOSX/
+.DS_Store
+
+# Git / IDE
+.vscode/
+.idea/
+
+# Optional: do not commit generated release zips into source history
+# Keep release zips for GitHub Releases instead
+*.zip
+*.sha256
+
+# But allow release manifest/docs if needed
+!docs/**
