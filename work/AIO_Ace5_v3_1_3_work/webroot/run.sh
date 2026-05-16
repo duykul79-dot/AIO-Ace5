@@ -11,6 +11,9 @@ _PERF_SCRIPT="${_MODULE_ROOT}/bin/aio_performance.sh"
 _SPOOF_SCRIPT="${_MODULE_ROOT}/bin/aio_game_spoof.sh"
 _SYS_SCRIPT="${_MODULE_ROOT}/bin/aio_system_toggles.sh"
 _TMP_BASE="/data/local/tmp/ca5"
+_SPOOF_STATE_DIR="/data/adb/aio_ace5/state"
+_SPOOF_STATE_FLAG="${_SPOOF_STATE_DIR}/game_spoof_enabled.flag"
+_SPOOF_OLD_FLAG="${_MODULE_ROOT}/bin/game_spoof_enabled.flag"
 
 _check_main() {
     [ -f "$_MAIN_SCRIPT" ] || { printf "[ERR] Script khong tim thay: %s\n" "$_MAIN_SCRIPT"; return 1; }
@@ -56,6 +59,13 @@ _pid_belongs_to_session() {
     return 1
 }
 _flag_state() { [ -f "$1" ] && printf 'on' || printf 'off'; }
+_spoof_state() {
+    if [ -f "$_SPOOF_OLD_FLAG" ] && [ ! -f "$_SPOOF_STATE_FLAG" ]; then
+        mkdir -p "$_SPOOF_STATE_DIR" 2>/dev/null
+        : > "$_SPOOF_STATE_FLAG" 2>/dev/null && chmod 0600 "$_SPOOF_STATE_FLAG" 2>/dev/null
+    fi
+    _flag_state "$_SPOOF_STATE_FLAG"
+}
 _pid_state() {
     _pidfile="$1"
     _pid=""
@@ -75,7 +85,7 @@ case "${1:-}" in
     printf 'INFO_TOUCH360=%s\n' "$(_flag_state "$_MODULE_ROOT/bin/touch_360_enabled.flag")"
     printf 'INFO_TOUCH360_WORKER=%s\n' "$(_pid_state "$_MODULE_ROOT/bin/touch_360_worker.pid")"
     printf 'INFO_GAME_MAX=%s\n' "$(_flag_state "$_MODULE_ROOT/bin/game_max_enabled.flag")"
-    printf 'INFO_GAME_SPOOF=%s\n' "$(_flag_state "$_MODULE_ROOT/bin/game_spoof_enabled.flag")"
+    printf 'INFO_GAME_SPOOF=%s\n' "$(_spoof_state)"
     printf 'INFO_CHARGE_MAX=%s\n' "$(_flag_state "$_MODULE_ROOT/bin/charge_max_enabled.flag")"
     [ -f "$_MODULE_ROOT/bin/thermal_shutdown_disable.flag" ] && printf 'INFO_SHUTDOWN_PROTECT=disabled\n' || printf 'INFO_SHUTDOWN_PROTECT=enabled\n'
     printf 'INFO_DEV_OPTIONS=%s\n' "$(_settings_state development_settings_enabled)"

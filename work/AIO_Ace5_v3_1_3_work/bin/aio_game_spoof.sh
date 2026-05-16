@@ -6,7 +6,9 @@
 MODDIR=${0%/*}/..
 MODDIR=$(cd "$MODDIR" 2>/dev/null && pwd || echo "/data/adb/modules/cleanup_ace5_v10_5")
 BIN_DIR="$MODDIR/bin"
-FLAG="$BIN_DIR/game_spoof_enabled.flag"
+OLD_FLAG="$BIN_DIR/game_spoof_enabled.flag"
+STATE_DIR="/data/adb/aio_ace5/state"
+FLAG="$STATE_DIR/game_spoof_enabled.flag"
 PROFILES_FILE="$BIN_DIR/game_spoof_profiles.conf"
 TARGETS_FILE="$BIN_DIR/game_spoof_targets.conf"
 CPU_BLACKLIST_FILE="$BIN_DIR/game_spoof_cpu_blacklist.conf"
@@ -40,6 +42,22 @@ else
         echo "[AIO] [$_module] [$_level] $_event $*"
     }
 fi
+
+_ensure_state_dir(){
+    mkdir -p "$STATE_DIR" 2>/dev/null
+}
+
+_migrate_state(){
+    if [ -f "$OLD_FLAG" ] && [ ! -f "$FLAG" ]; then
+        _ensure_state_dir
+        : > "$FLAG" 2>/dev/null && chmod 0600 "$FLAG" 2>/dev/null
+    fi
+}
+
+_spoof_enabled(){
+    _migrate_state
+    [ -f "$FLAG" ]
+}
 
 _log(){
     mkdir -p /data/local/tmp 2>/dev/null
@@ -213,7 +231,7 @@ _print_json_string_array_from_file(){
 _export_aio_json(){
     _tmp="${JSON_FILE}.tmp.$$"
     : > "$_tmp" || return 1
-    if [ -f "$FLAG" ]; then _enabled=true; else _enabled=false; fi
+    if _spoof_enabled; then _enabled=true; else _enabled=false; fi
     {
         printf '{\n'
         printf '  "schema_version": 2,\n'
@@ -275,7 +293,7 @@ _export_copg_json(){
     : > "$_tmp" || return 1
     # COPG engine has no top-level enabled switch. When Game Spoof is OFF,
     # export an empty compatible config so the integrated Zygisk engine cannot spoof any package.
-    if [ ! -f "$FLAG" ]; then
+    if ! _spoof_enabled; then
         {
             printf '{\n'
             printf '  "cpu_spoof": {"blacklist": [], "cpu_only_packages": []}\n'
@@ -433,7 +451,7 @@ _export_all(){
     _export_aio_json || return 1
     _export_copg_json || return 1
     _export_public
-    if [ -f "$FLAG" ]; then
+    if _spoof_enabled; then
         _setup_engine >/dev/null 2>&1 || true
     else
         _stop_engine >/dev/null 2>&1 || true
@@ -446,7 +464,7 @@ _status(){
     if [ ! -f "$JSON_FILE" ] || [ ! -f "$COPG_JSON_FILE" ]; then
         _export_all >/dev/null 2>&1 || true
     fi
-    if [ -f "$FLAG" ]; then _state="on"; else _state="off"; fi
+    if _spoof_enabled; then _state="on"; else _state="off"; fi
     printf 'INFO_GAME_SPOOF=%s\n' "$_state"
     printf 'INFO_GAME_SPOOF_MODE=auto_by_game\n'
     printf 'INFO_GAME_SPOOF_PROFILES=%s\n' "$(_profile_count)"
@@ -471,6 +489,7 @@ _status(){
 
 _enable(){
     _init_all
+    _ensure_state_dir
     : > "$FLAG" || { printf '[ERR] Không tạo được flag Game Spoof.\n'; return 1; }
     chmod 0600 "$FLAG" 2>/dev/null
     if _export_all; then
@@ -494,6 +513,7 @@ _enable(){
 
 _disable(){
     rm -f "$FLAG" 2>/dev/null
+    rm -f "$OLD_FLAG" 2>/dev/null
     if _export_all; then
         _log "disabled mode=auto_by_game"
         printf '[OK] Đã tắt cấu hình Game Spoof.\n'

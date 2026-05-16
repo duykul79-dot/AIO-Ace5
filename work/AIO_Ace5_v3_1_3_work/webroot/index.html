@@ -225,7 +225,9 @@ main{display:block}
 /* ── PER-ICON COLOR THEMES ─────────────────────────────── */
 /* Hero quick-toggle tiles — frameless, each tile a distinct vivid color */
 #heroTile-touch .hero-tile-ico .iso{--ic-primary:var(--ic-cyan);--ic-soft:var(--ic-cyan-soft);--ic-accent:var(--ic-cyan)}
+#heroTile-cooldown .hero-tile-ico .iso{--ic-primary:var(--ic-teal);--ic-soft:var(--ic-teal-soft);--ic-accent:var(--ic-teal)}
 #heroTile-game .hero-tile-ico .iso{--ic-primary:var(--ic-violet);--ic-soft:var(--ic-violet-soft);--ic-accent:var(--ic-violet)}
+#heroTile-spoof .hero-tile-ico .iso{--ic-primary:var(--ic-pink);--ic-soft:var(--ic-pink-soft);--ic-accent:var(--ic-pink)}
 #heroTile-charge .hero-tile-ico .iso{--ic-primary:var(--ic-amber);--ic-soft:var(--ic-amber-soft);--ic-accent:var(--ic-amber)}
 #heroTile-shutdown .hero-tile-ico .iso{--ic-primary:var(--ic-red);--ic-soft:var(--ic-red-soft);--ic-accent:var(--ic-red)}
 #heroTile-dev .hero-tile-ico .iso{--ic-primary:var(--ic-indigo);--ic-soft:var(--ic-indigo-soft);--ic-accent:var(--ic-indigo)}
@@ -238,6 +240,8 @@ main{display:block}
 #quickTouch360Row .toggle-ico .iso{--ic-primary:var(--ic-cyan);--ic-soft:var(--ic-cyan-soft);--ic-accent:var(--ic-cyan)}
 #perfGameRow .toggle-ico{background:var(--ic-violet-soft)}
 #perfGameRow .toggle-ico .iso{--ic-primary:var(--ic-violet);--ic-soft:var(--ic-violet-soft);--ic-accent:var(--ic-violet)}
+#perfSpoofRow .toggle-ico{background:var(--ic-pink-soft)}
+#perfSpoofRow .toggle-ico .iso{--ic-primary:var(--ic-pink);--ic-soft:var(--ic-pink-soft);--ic-accent:var(--ic-pink)}
 #perfChargeRow .toggle-ico{background:var(--ic-amber-soft)}
 #perfChargeRow .toggle-ico .iso{--ic-primary:var(--ic-amber);--ic-soft:var(--ic-amber-soft);--ic-accent:var(--ic-amber)}
 
@@ -393,15 +397,16 @@ main{display:block}
   100%{box-shadow:0 0 0 7px rgba(16,163,100,0)}
 }
 .hero-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:5px;
+  display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px;
   position:relative;
 }
 .hero-tile{
   background:var(--bg-soft);
   border:1px solid var(--hairline);
   border-radius:var(--r-md);
-  padding:6px 4px 5px;
-  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:4px 2px 3px;
+  min-height:42px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
   transition:border-color .2s,background .2s,box-shadow .2s,transform .12s;
   position:relative;
   cursor:pointer;
@@ -416,7 +421,7 @@ main{display:block}
 .hero-tile:focus-visible{box-shadow:0 0 0 3px var(--primary-soft)}
 .hero-tile:hover{border-color:var(--primary);box-shadow:var(--shadow-sm)}
 .hero-tile:active{transform:translateY(1px)}
-.hero-tile.is-busy{opacity:.65;pointer-events:none}
+.hero-tile.is-busy,.toggle-row.is-busy{opacity:.65;pointer-events:none}
 .hero-tile.is-on{
   background:var(--primary-soft);
   border-color:var(--primary);
@@ -435,16 +440,17 @@ main{display:block}
   font-size:0;
   padding:0;
 }
-.hero-tile-ico .iso{font-size:28px;line-height:1}
+.hero-tile-ico .iso{font-size:18px;line-height:1}
 .hero-tile-label{
-  font-size:10.5px;color:var(--ink-2);font-weight:700;
-  letter-spacing:.02em;line-height:1.1;text-align:center;
+  font-size:8px;color:var(--ink-2);font-weight:700;
+  letter-spacing:0;line-height:1.05;text-align:center;
+  max-width:100%;overflow:hidden;text-overflow:ellipsis;
 }
 .hero-tile.is-on .hero-tile-label{color:var(--primary)}
 .hero-tile.warn.is-on .hero-tile-label{color:var(--warning)}
 .hero-tile-state{
-  font-size:8.5px;color:var(--muted-2);font-weight:700;
-  letter-spacing:.08em;text-transform:uppercase;
+  font-size:7px;color:var(--muted-2);font-weight:800;
+  letter-spacing:.04em;text-transform:uppercase;
   margin-top:0;
 }
 
@@ -792,21 +798,21 @@ main{display:block}
 /* ── LIVE LOG ───────────────────────────────────────────── */
 .log-card{
   display:block;
-  padding:14px 14px 15px;
+  padding:9px 10px 10px;
 }
 .log-topbar{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  margin-bottom:10px;
+  display:flex;align-items:center;justify-content:space-between;gap:6px;
+  margin-bottom:6px;
 }
-.log-heading{min-width:0;display:flex;flex-direction:column;gap:2px}
+.log-heading{min-width:0;display:flex;flex-direction:column;gap:1px}
 .log-title{
-  margin:0;font-size:15px;font-weight:800;color:var(--ink);
-  letter-spacing:-.1px;line-height:1.2;
+  margin:0;font-size:13.5px;font-weight:800;color:var(--ink);
+  letter-spacing:-.1px;line-height:1.15;
 }
 .log-subtitle{
-  font-size:11.5px;color:var(--muted);font-weight:500;line-height:1.35;
+  font-size:10.5px;color:var(--muted);font-weight:500;line-height:1.25;
 }
-.log-actions{display:flex;align-items:center;gap:7px;flex:0 0 auto}
+.log-actions{display:none!important}
 .log-status{
   display:inline-flex;align-items:center;gap:6px;
   height:26px;padding:0 10px;border-radius:var(--r-pill);
@@ -822,6 +828,9 @@ main{display:block}
 .log-status.is-running{background:var(--primary-soft);border-color:var(--primary);color:var(--primary)}
 .log-status.is-done{background:var(--success-soft);border-color:transparent;color:var(--success)}
 .log-status.is-error{background:var(--error-soft);border-color:transparent;color:var(--error)}
+.log-detail-state{
+  margin-top:5px;color:var(--ink-2);font-size:11px;font-weight:600;line-height:1.2;
+}
 .btn-clear{
   height:26px;border:1px solid var(--hairline);border-radius:var(--r-pill);
   background:var(--surface);color:var(--muted);
@@ -830,8 +839,8 @@ main{display:block}
 }
 .btn-clear:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-soft)}
 .log-progress{
-  height:4px;border-radius:var(--r-pill);background:var(--surface-3);
-  overflow:hidden;margin-bottom:10px;
+  height:3px;border-radius:var(--r-pill);background:var(--surface-3);
+  overflow:hidden;margin-bottom:5px;
 }
 .log-progress .prog-fill{
   height:100%;width:0;border-radius:var(--r-pill);
@@ -839,6 +848,7 @@ main{display:block}
   transition:width .3s ease;
 }
 .log-body{
+  display:none!important;
   min-height:104px;max-height:260px;overflow:auto;
   border:1px solid var(--hairline);border-radius:var(--r-md);
   background:var(--bg-soft);
@@ -1053,8 +1063,8 @@ main{display:block}
 @media (max-width:420px){
   .card{padding:14px 14px 16px}
   .hero{padding:8px 10px 7px}
-  .hero-tile-ico .iso{font-size:24px}
-  .hero-tile-label{font-size:11px}
+  .hero-tile-ico .iso{font-size:17px}
+  .hero-tile-label{font-size:7.5px}
   .bat-kpis{grid-template-columns:repeat(5,1fr);gap:4px}
   .bat-kpi-val{font-size:13px}
   .tab span:not(.tab-ico){font-size:10.5px}
@@ -1318,20 +1328,20 @@ main{display:block}
         <div class="hero-tile-label">360Hz</div>
         <div class="hero-tile-state" data-state-source="quickTouch360Row" data-state-on="ON" data-state-off="OFF">OFF</div>
       </button>
-      <button type="button" class="hero-tile" id="heroTile-game" data-quick-toggle="game" aria-pressed="false" aria-label="Bật tắt Game Max và Spoof">
+      <button type="button" class="hero-tile" id="heroTile-game" data-quick-toggle="game" aria-pressed="false" aria-label="Bật tắt Game Max">
         <div class="hero-tile-ico"><span class="iso"><svg viewBox="0 0 32 32"><use href="#i-gamepad"/></svg></span></div>
         <div class="hero-tile-label">Game Max</div>
         <div class="hero-tile-state" data-state-source="perfGameRow" data-state-on="ON" data-state-off="OFF">OFF</div>
+      </button>
+      <button type="button" class="hero-tile" id="heroTile-spoof" data-quick-toggle="spoof" aria-pressed="false" aria-label="Bật tắt Game Spoof">
+        <div class="hero-tile-ico"><span class="iso"><svg viewBox="0 0 32 32"><use href="#i-gamepad"/></svg></span></div>
+        <div class="hero-tile-label">Game Spoof</div>
+        <div class="hero-tile-state" data-state-source="perfSpoofRow" data-state-on="ON" data-state-off="OFF">OFF</div>
       </button>
       <button type="button" class="hero-tile" id="heroTile-charge" data-quick-toggle="charge" aria-pressed="false" aria-label="Bật tắt Sạc Max">
         <div class="hero-tile-ico"><span class="iso"><svg viewBox="0 0 32 32"><use href="#i-plug"/></svg></span></div>
         <div class="hero-tile-label">Sạc Max</div>
         <div class="hero-tile-state" data-state-source="perfChargeRow" data-state-on="ON" data-state-off="OFF">OFF</div>
-      </button>
-      <button type="button" class="hero-tile warn" id="heroTile-shutdown" data-quick-toggle="shutdown" aria-pressed="false" aria-label="Bật tắt shutdown bảo vệ nhiệt">
-        <div class="hero-tile-ico"><span class="iso"><svg viewBox="0 0 32 32"><use href="#i-thermal"/></svg></span></div>
-        <div class="hero-tile-label">Shutdown</div>
-        <div class="hero-tile-state" data-state-source="perfShutdownRow" data-state-on="OFF" data-state-off="ARMED">ARMED</div>
       </button>
       <button type="button" class="hero-tile" id="heroTile-dev" data-quick-toggle="dev" aria-pressed="false" aria-label="Bật tắt Tuỳ chọn nhà phát triển">
         <div class="hero-tile-ico"><span class="iso"><svg viewBox="0 0 32 32"><use href="#i-dev"/></svg></span></div>
@@ -1344,6 +1354,21 @@ main{display:block}
         <div class="hero-tile-state" id="heroTileUsbState" data-state-on="ON" data-state-off="OFF">OFF</div>
       </button>
     </div>
+  </section>
+
+  <!-- ── LIVE STATUS -->
+  <section class="card log-card" aria-live="polite">
+    <div class="log-topbar">
+      <div class="log-heading">
+        <h3 class="log-title">Tiến trình tác vụ</h3>
+        <div class="log-subtitle" id="termTitle">AIO Ace5 - sẵn sàng</div>
+      </div>
+    </div>
+    <div class="log-progress">
+      <div class="prog-fill" id="actionProgressBar"></div>
+    </div>
+    <div class="log-detail-state" id="taskStatusLine">0%</div>
+    <div class="log-body" id="log" hidden aria-hidden="true"></div>
   </section>
 
   <main>
@@ -1486,7 +1511,6 @@ main{display:block}
       <div class="card">
         <div class="card-eyebrow">Pin</div>
         <h3 class="card-title">Phân tích pin</h3>
-        <p class="card-desc">Rút sạc, tắt màn hình 45–60 phút rồi mở máy và bấm phân tích. Báo cáo chính xác hơn sau một chu kỳ sử dụng đủ dài.</p>
         <button class="big-btn primary action-btn" id="btnBattery" style="margin-top:14px">
           <span class="big-btn-ico"><span class="iso"><svg viewBox="0 0 32 32"><use href="#i-battery"/></svg></span></span>
           <span class="big-btn-content">
@@ -1495,13 +1519,6 @@ main{display:block}
           </span>
           <span class="big-btn-arrow"><span class="iso"><svg viewBox="0 0 24 24"><use href="#i-arrow"/></svg></span></span>
         </button>
-        <div class="battery-prog">
-          <div class="progress-bar"><div class="progress-fill" id="batteryProgressBar"></div></div>
-          <div class="battery-prog-labels">
-            <span id="batteryProgressStatus">Sẵn sàng</span>
-            <span id="batteryProgressText">0%</span>
-          </div>
-        </div>
         <div class="battery-empty">
           <span class="battery-empty-ico"><span class="iso"><svg viewBox="0 0 32 32"><use href="#i-plug"/></svg></span></span>
           <span>Chưa có báo cáo. Bấm nút trên để tạo báo cáo đầu tiên — sẽ mất ~30 giây.</span>
@@ -1559,8 +1576,7 @@ main{display:block}
     <section id="performance" class="page hidden">
       <div class="card">
         <div class="card-eyebrow">Hiệu năng</div>
-        <h3 class="card-title">360Hz · Game Max + Spoof · Sạc Max</h3>
-        <p class="card-desc">Bật/tắt nhanh các chế độ hiệu năng cao. Trạng thái tự lưu sau reboot. Nhớ reboot 1 lần sau khi đổi để áp dụng đầy đủ.</p>
+        <h3 class="card-title">360Hz · Game Max · Game Spoof · Sạc Max</h3>
 
         <div class="toggles">
 
@@ -1589,11 +1605,11 @@ main{display:block}
               <div class="toggle-info">
                 <div class="toggle-ico"><span class="iso"><svg viewBox="0 0 32 32"><use href="#i-gamepad"/></svg></span></div>
                 <div class="toggle-text">
-                  <div class="toggle-title">Game Max + Spoof <span class="toggle-state" id="perfGameState">Đang tắt</span></div>
-                  <div class="toggle-sub">Mở FPS cao và giả lập thiết bị cho game hỗ trợ.</div>
+                  <div class="toggle-title">Game Max <span class="toggle-state" id="perfGameState">Đang tắt</span></div>
+                  <div class="toggle-sub">Áp dụng overlay hiệu năng/nhiệt cho game hỗ trợ. Nên reboot sau khi đổi.</div>
                 </div>
               </div>
-              <label class="md-switch" aria-label="Bật tắt Game Max và Spoof">
+              <label class="md-switch" aria-label="Bật tắt Game Max">
                 <input class="quick-switch" type="checkbox" id="switchGameMax">
                 <span class="md-switch-track"><span class="md-switch-thumb"></span></span>
               </label>
@@ -1601,6 +1617,26 @@ main{display:block}
             <div class="toggle-mini" id="perfGameProgress">
               <div class="toggle-mini-track"><div class="toggle-mini-fill" id="perfGameFill"></div></div>
               <div class="toggle-mini-label" id="perfGameLabel">Sẵn sàng</div>
+            </div>
+          </div>
+
+          <div data-perf-item="spoof">
+            <div class="toggle-row" id="perfSpoofRow">
+              <div class="toggle-info">
+                <div class="toggle-ico"><span class="iso"><svg viewBox="0 0 32 32"><use href="#i-gamepad"/></svg></span></div>
+                <div class="toggle-text">
+                  <div class="toggle-title">Game Spoof <span class="toggle-state" id="perfSpoofState">Đang tắt</span></div>
+                  <div class="toggle-sub">Áp dụng profile/spoof và tương thích COPG riêng, không tự bật Game Max.</div>
+                </div>
+              </div>
+              <label class="md-switch" aria-label="Bật tắt Game Spoof">
+                <input class="quick-switch" type="checkbox" id="switchGameSpoof">
+                <span class="md-switch-track"><span class="md-switch-thumb"></span></span>
+              </label>
+            </div>
+            <div class="toggle-mini" id="perfSpoofProgress">
+              <div class="toggle-mini-track"><div class="toggle-mini-fill" id="perfSpoofFill"></div></div>
+              <div class="toggle-mini-label" id="perfSpoofLabel">Sẵn sàng</div>
             </div>
           </div>
 
@@ -1646,24 +1682,6 @@ main{display:block}
 
         </div>
       </div>
-    </section>
-
-    <!-- ── LIVE LOG -->
-    <section class="card log-card" aria-live="polite">
-      <div class="log-topbar">
-        <div class="log-heading">
-          <h3 class="log-title">Nhật ký thời gian thực</h3>
-          <div class="log-subtitle" id="termTitle">AIO Ace5 — sẵn sàng</div>
-        </div>
-        <div class="log-actions">
-          <span class="log-status" id="logStatusPill">Sẵn sàng</span>
-          <button class="btn-clear" id="clearBtn" type="button">Xóa</button>
-        </div>
-      </div>
-      <div class="log-progress">
-        <div class="prog-fill" id="actionProgressBar"></div>
-      </div>
-      <div class="log-body" id="log"><div class="placeholder" id="placeholder">Chưa có nhật ký. Chạy một tác vụ để xem tiến trình tại đây.</div></div>
     </section>
 
     <!-- ── HELP (mỗi tab) ──────────────────────────────────── -->
@@ -1714,8 +1732,8 @@ window.aioSystemState=window.aioSystemState||{dev:false,usb:false};
   const tiles=[
     {tile:'heroTile-touch',row:'quickTouch360Row',onLabel:'ON',offLabel:'OFF'},
     {tile:'heroTile-game',row:'perfGameRow',onLabel:'ON',offLabel:'OFF'},
+    {tile:'heroTile-spoof',row:'perfSpoofRow',onLabel:'ON',offLabel:'OFF'},
     {tile:'heroTile-charge',row:'perfChargeRow',onLabel:'ON',offLabel:'OFF'},
-    {tile:'heroTile-shutdown',row:'perfShutdownRow',onLabel:'OFF',offLabel:'ARMED'},
     {tile:'heroTile-dev',stateKey:'dev',label:'heroTileDevState',onLabel:'ON',offLabel:'OFF'},
     {tile:'heroTile-usb',stateKey:'usb',label:'heroTileUsbState',onLabel:'ON',offLabel:'OFF'}
   ];
@@ -1746,7 +1764,6 @@ window.aioSystemState=window.aioSystemState||{dev:false,usb:false};
       if(r) ro.observe(r,{attributes:true,attributeFilter:['class']});
     });
     refresh();
-    setInterval(refresh,1500);
   });
 })();
 </script>
@@ -1762,6 +1779,7 @@ const CLEANUP_MODES=new Set(['clean','modules','boost','dalvik','network','all']
 let bridge='sh '+BRIDGES[0], bridgeInfoOut='', ksuFn=null, running=false, sid=null, timer=null, started=0, activeMod='', activeTab='debloat', batteryLines=[];
 let lastProgressKey='', lastProgressAt=0, lastHeartbeatAt=0, lastOutputAt=0, maxRuntimeWarned=false, visibleInPoll=0, backendRunStarted=false;
 let quickRefreshInFlight=false, quickRefreshLastAt=0, quickRefreshOffline=false;
+let tabRefreshTimer=null;
 const QUICK_REFRESH_MIN_MS=2500;
 const $=s=>document.querySelector(s);
 const log=$('#log');
@@ -1775,7 +1793,7 @@ const HELP={
   cleanup:['Mẹo nhanh',[
     'Dọn nhanh: ưu tiên tốc độ, giải phóng cơ bản.',
     'Dọn toàn bộ: chạy mọi mục, lâu hơn nhưng sạch hơn.',
-    'Theo dõi log realtime ngay dưới thanh tiến độ.'
+    'Theo dõi trạng thái chạy ở thẻ Tiến trình tác vụ phía trên.'
   ]],
   battery:['Mẹo nhanh',[
     'Rút sạc, tắt màn ~45–60 phút rồi bấm Chạy phân tích.',
@@ -1783,7 +1801,7 @@ const HELP={
   ]],
   performance:['Mẹo nhanh',[
     'Sau khi bật/tắt: reboot 1 lần để áp dụng đầy đủ.',
-    'Game Max + Spoof: chỉ áp dụng game trong danh sách.',
+    'Game Max và Game Spoof có công tắc riêng, không tự bật/tắt lẫn nhau.',
     'Sạc Max & Shutdown nhiệt: máy có thể nóng hơn — tự theo dõi nhiệt.'
   ]]
 };
@@ -1792,12 +1810,15 @@ function toast(t){const e=$('#toast');e.textContent=t;e.style.opacity='1';setTim
 function closeCleanupRebootModal(){const m=$('#cleanupRebootModal');if(m)m.classList.add('hidden')}
 function showCleanupRebootModal(){const m=$('#cleanupRebootModal');if(m)m.classList.remove('hidden')}
 function fmt(ms){let s=Math.floor(ms/1000);return s<60?s+'s':Math.floor(s/60)+'m '+(s%60)+'s'}
+function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+function updateTaskCardVisibility(){document.querySelector('.log-card')?.classList.toggle('hidden',activeTab==='performance')}
 function setHelp(tab){const h=HELP[tab]||HELP.debloat;$('#helpTitle').textContent=h[0];$('#helpBody').innerHTML='<ul style="margin:8px 0 0 18px;padding:0">'+h[1].map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>'}
 function setStatus(t,busy=false){const st=$('#status'),chip=$('#statusChip'),dot=$('#dot'); if(!st||!chip||!dot)return; st.textContent=t; chip.classList.toggle('running',busy); dot.style.background=busy?'var(--warning)':'var(--success)'}
-function setActionProgress(p){p=Math.max(0,Math.min(100,parseInt(p||0)));$('#actionProgressBar').style.width=p+'%'}
-function setBatteryProgress(p,msg){p=Math.max(0,Math.min(100,parseInt(p||0)));$('#batteryProgressBar').style.width=p+'%';$('#batteryProgressText').textContent=p+'%';$('#batteryProgressStatus').textContent=vnPhrase(msg||'Đang chạy')}
+function setActionProgress(p){p=Math.max(0,Math.min(100,parseInt(p||0)));$('#actionProgressBar').style.width=p+'%';const e=$('#taskStatusLine');if(e)e.textContent=p+'%'}
+function setTaskStatusLine(t){const e=$('#taskStatusLine');if(e&&t)e.textContent=t}
+function setBatteryProgress(p,msg){p=Math.max(0,Math.min(100,parseInt(p||0)));const bar=$('#batteryProgressBar'),text=$('#batteryProgressText'),status=$('#batteryProgressStatus');if(bar)bar.style.width=p+'%';if(text)text.textContent=p+'%';if(status)status.textContent=vnPhrase(msg||'Đang chạy')}
 const RUN_CARD_MAP={cleanup:{card:'#cleanupProgressCard',title:'#cleanupProgressTitle',fill:'#cleanupProgressFill',counter:'#cleanupProgressCounter',pkg:'#cleanupProgressPkg'},battery:{card:'#batteryTaskProgressCard',title:'#batteryTaskProgressTitle',fill:'#batteryTaskProgressFill',counter:'#batteryTaskProgressCounter',pkg:'#batteryTaskProgressPkg'}};
-const RUN_TITLES={clean:'Dọn nhanh',modules:'KSU Modules',boost:'Boost nhẹ',dalvik:'ART / Dalvik',network:'Network',all:'Dọn toàn bộ','battery-run':'Phân tích pin','performance-game-enable':'Bật Game Max + Spoof','performance-game-disable':'Tắt Game Max + Spoof','performance-charge-enable':'Bật Sạc Max','performance-charge-disable':'Tắt Sạc Max','performance-spoof-enable':'Bật Game Spoof','performance-spoof-disable':'Tắt Game Spoof','performance-shutdown-arm':'Xác nhận bước 1 Shutdown nhiệt','performance-shutdown-confirm':'Xác nhận bước 2 Shutdown nhiệt','performance-shutdown-enable':'Tắt shutdown bảo vệ nhiệt','performance-shutdown-disable':'Bật lại shutdown bảo vệ nhiệt','performance-status':'Trạng thái Hiệu năng'};
+const RUN_TITLES={clean:'Dọn nhanh',modules:'KSU Modules',boost:'Boost nhẹ',dalvik:'ART / Dalvik',network:'Network',all:'Dọn toàn bộ','battery-run':'Phân tích pin','performance-game-enable':'Bật Game Max','performance-game-disable':'Tắt Game Max','performance-charge-enable':'Bật Sạc Max','performance-charge-disable':'Tắt Sạc Max','performance-spoof-enable':'Bật Game Spoof','performance-spoof-disable':'Tắt Game Spoof','performance-shutdown-arm':'Xác nhận bước 1 Shutdown nhiệt','performance-shutdown-confirm':'Xác nhận bước 2 Shutdown nhiệt','performance-shutdown-enable':'Tắt shutdown bảo vệ nhiệt','performance-shutdown-disable':'Bật lại shutdown bảo vệ nhiệt','performance-status':'Trạng thái Hiệu năng'};
 const RUN_TIMEOUTS={clean:{idle:45,max:180},modules:{idle:45,max:300},boost:{idle:60,max:300},network:{idle:30,max:90},dalvik:{idle:90,max:900},all:{idle:90,max:1200},'battery-run':{idle:360,max:1800}};
 function runTimeouts(mod){return RUN_TIMEOUTS[mod]||{idle:45,max:300}}
 function showRunCard(type,title,total,label){const m=RUN_CARD_MAP[type]; if(!m)return; const card=$(m.card),t=$(m.title),f=$(m.fill),c=$(m.counter),p=$(m.pkg); if(card) card.classList.remove('hidden','fading'); if(t) t.textContent=title||'Đang xử lý'; if(f) f.style.width='0%'; if(c) c.textContent='0 / '+(total||1); if(p) p.textContent=label||'Đang chuẩn bị...'; if(type==='cleanup') cleanupLiveLogReset(activeMod==='clean'||activeMod==='all');}
@@ -1811,14 +1832,17 @@ function setButtonsDisabled(disabled){document.querySelectorAll('.action-btn,.ta
 function resetBatteryReport(){batteryLines=[];setBatteryProgress(0,'Sẵn sàng');$('#batteryTop').textContent='Chưa có dữ liệu';$('#batteryUsed').textContent='--';$('#batteryDrain').textContent='--';$('#batteryTemp').textContent='--';$('#batteryCapacity').textContent='--';$('#batteryPower').textContent='--';$('#batteryReportRows').innerHTML='<tr><td>Kết quả</td><td>Đang chạy</td></tr>';$('#batteryTopRows').innerHTML='<tr><td colspan="5">Đang chờ kết quả</td></tr>'}
 function setLogStatus(state){
   const pill=$('#logStatusPill');
-  if(!pill)return;
-  pill.className='log-status';
-  if(state==='running'){pill.textContent='Đang chạy';pill.classList.add('is-running')}
-  else if(state==='done'){pill.textContent='Hoàn tất';pill.classList.add('is-done')}
-  else if(state==='error'){pill.textContent='Lỗi';pill.classList.add('is-error')}
-  else pill.textContent='Sẵn sàng';
+  if(pill){
+    pill.className='log-status';
+    if(state==='running'){pill.textContent='Đang chạy';pill.classList.add('is-running')}
+    else if(state==='done'){pill.textContent='Hoàn tất';pill.classList.add('is-done')}
+    else if(state==='error'){pill.textContent='Lỗi';pill.classList.add('is-error')}
+    else pill.textContent='Sẵn sàng';
+  }
+  if(state==='error')setTaskStatusLine('Có lỗi, vui lòng kiểm tra log/report');
+  else if(state==='idle')setActionProgress(0);
 }
-function clearLog(){document.querySelector('.log-card')?.classList.remove('hidden');log.innerHTML='<div class="placeholder" id="placeholder">Chưa có nhật ký. Chạy một tác vụ để xem tiến trình tại đây.</div>'}
+function clearLog(){updateTaskCardVisibility();if(log)log.textContent='';setActionProgress(0)}
 function removePlaceholder(target=log){const ph=target?.querySelector('.placeholder'); if(ph) ph.remove()}function vnPhrase(s){
   s=String(s||'').replace(/\.\.\. \d+s$/,'').trim();
   const map={
@@ -1914,20 +1938,9 @@ function cleanupPhrase(s){
 
 function appendVisible(line){
   const raw=String(line||'');
-  removePlaceholder(log);
   const m=raw.match(/^\[([^\]]+)\]\s*(.*)$/);
-  const d=document.createElement('div');
-  d.className='log-line';
   let tag='Thông tin', body=raw;
   if(m){tag=m[1];body=m[2]||''}
-  const bodyLower=body.toLowerCase(), tagLower=tag.toLowerCase();
-  if(/ok|pass|done|hoàn tất|xong|thành công|summary/.test(tagLower+' '+bodyLower)) d.classList.add('is-success');
-  else if(/err|error|fail|failed|lỗi|thất bại/.test(tagLower+' '+bodyLower)) d.classList.add('is-danger');
-  else if(/warn|cảnh báo|skip|bỏ qua/.test(tagLower+' '+bodyLower)) d.classList.add('is-warning');
-  else if(/info|running|đang chạy|progress|thông tin/.test(tagLower+' '+bodyLower)) d.classList.add('is-info');
-  d.innerHTML='<span class="tag">['+esc(tag)+']</span><span>'+esc(body)+'</span>';
-  log.appendChild(d);
-  log.scrollTop=log.scrollHeight;
   cleanupLiveLogAdd(raw);
   const lower=tag.toLowerCase();
   if(tag==='OK') counts.ok++;
@@ -2101,12 +2114,17 @@ document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
   $('#batteryReport').classList.toggle('hidden',activeTab!=='battery');
   $('#sub').textContent=activeTab==='battery'?'Pin':(activeTab==='cleanup'?'Dọn rác':(activeTab==='performance'?'Hiệu năng':'Debloat'));
   $('#termTitle').textContent='AIO Ace5 - '+$('#sub').textContent+' - sẵn sàng';
+  updateTaskCardVisibility();
   setHelp(activeTab);
-  quickRefresh(false);
+  if(tabRefreshTimer)clearTimeout(tabRefreshTimer);
+  if(Date.now()-quickRefreshLastAt>=QUICK_REFRESH_MIN_MS){
+    tabRefreshTimer=setTimeout(()=>{tabRefreshTimer=null;quickRefresh(false)},120);
+  }
 });
 document.querySelectorAll('[data-mod]').forEach(b=>b.onclick=()=>run(b.dataset.mod));
 $('#btnBattery').onclick=()=>run('battery-run');
-$('#clearBtn').onclick=()=>{log.innerHTML='<div class="placeholder">Chưa có nhật ký. Chạy một tác vụ để xem tiến trình tại đây.</div>';setLogStatus(running?'running':'idle')};
+const clearBtn=$('#clearBtn');
+if(clearBtn)clearBtn.onclick=()=>{if(log)log.textContent='';setLogStatus(running?'running':'idle')};
 $('#cleanupRebootLater').onclick=closeCleanupRebootModal;
 $('#cleanupRebootModal').onclick=e=>{if(e.target.id==='cleanupRebootModal')closeCleanupRebootModal()};
 $('#cleanupRebootNow').onclick=()=>{closeCleanupRebootModal();run('reboot-device')};
@@ -2347,8 +2365,8 @@ function perfProgressTitle(route,fallback){
   const map={
     'debloat-touch360-enable':'Bật 360Hz',
     'debloat-touch360-disable':'Tắt 360Hz',
-    'performance-game-enable':'Bật Game Max + Spoof',
-    'performance-game-disable':'Tắt Game Max + Spoof',
+    'performance-game-enable':'Bật Game Max',
+    'performance-game-disable':'Tắt Game Max',
     'performance-charge-enable':'Bật Sạc Max',
     'performance-charge-disable':'Tắt Sạc Max',
     'performance-spoof-enable':'Bật Game Spoof',
@@ -2362,6 +2380,7 @@ function perfProgressTitle(route,fallback){
 const perfMini={
   touch:{box:'#perfTouchProgress',fill:'#perfTouchFill',label:'#perfTouchLabel'},
   game:{box:'#perfGameProgress',fill:'#perfGameFill',label:'#perfGameLabel'},
+  spoof:{box:'#perfSpoofProgress',fill:'#perfSpoofFill',label:'#perfSpoofLabel'},
   charge:{box:'#perfChargeProgress',fill:'#perfChargeFill',label:'#perfChargeLabel'},
   shutdown:{box:'#perfShutdownProgress',fill:'#perfShutdownFill',label:'#perfShutdownLabel'}
 };
@@ -2369,7 +2388,7 @@ const perfRouteKind={
   'debloat-touch360-enable':'touch','debloat-touch360-disable':'touch',
   'performance-game-enable':'game','performance-game-disable':'game',
   'performance-charge-enable':'charge','performance-charge-disable':'charge',
-  'performance-spoof-enable':'game','performance-spoof-disable':'game',
+  'performance-spoof-enable':'spoof','performance-spoof-disable':'spoof',
   'performance-shutdown-arm':'shutdown','performance-shutdown-confirm':'shutdown','performance-shutdown-enable':'shutdown','performance-shutdown-disable':'shutdown'
 };
 const perfMiniTimers={};
@@ -2400,11 +2419,24 @@ async function perfRunWithProgress(route,title,kind){
   return !!ok;
 }
 const perfState={game:false,charge:false,spoof:false,shutdown:false};
+const perfToggleBusy={game:false,spoof:false,charge:false,shutdown:false};
 const perfCfg={
-  game:{sw:'#switchGameMax',row:'#perfGameRow',st:'#perfGameState',on:'Đang bật',off:'Đang tắt',partial:'Chưa đồng bộ',label:'Game Max + Spoof'},
+  game:{sw:'#switchGameMax',row:'#perfGameRow',st:'#perfGameState',on:'Đang bật',off:'Đang tắt',label:'Game Max'},
+  spoof:{sw:'#switchGameSpoof',row:'#perfSpoofRow',st:'#perfSpoofState',on:'Đang bật',off:'Đang tắt',label:'Game Spoof'},
   charge:{sw:'#switchChargeMax',row:'#perfChargeRow',st:'#perfChargeState',on:'Đang bật',off:'Đang tắt',label:'Sạc Max'},
   shutdown:{sw:'#switchThermalShutdown',row:'#perfShutdownRow',st:'#perfShutdownState',on:'Đã tắt bảo vệ',off:'Đang bảo vệ',label:'Tắt shutdown bảo vệ nhiệt'}
 };
+function perfAnyBusy(){return Object.values(perfToggleBusy).some(Boolean)}
+function perfSetBusy(kind,busy){
+  const cfg=perfCfg[kind]; if(!cfg)return;
+  perfToggleBusy[kind]=!!busy;
+  const sw=$(cfg.sw), row=$(cfg.row), tile=$('#heroTile-'+kind);
+  if(sw)sw.disabled=!!busy;
+  if(row)row.classList.toggle('is-busy',!!busy);
+  if(tile)tile.classList.toggle('is-busy',!!busy);
+  if(window.aioRefreshHero) window.aioRefreshHero();
+}
+async function perfReconcile(){await delay(220);await quickRefresh(true)}
 function perfSet(kind,on){
   const cfg=perfCfg[kind]; if(!cfg)return;
   const sw=$(cfg.sw), row=$(cfg.row), st=$(cfg.st);
@@ -2412,14 +2444,6 @@ function perfSet(kind,on){
   if(row)row.classList.toggle('is-on',!!on);
   if(st)st.textContent=on?cfg.on:cfg.off;
   perfState[kind]=!!on;
-}
-function perfSetGameCombo(gameOn,spoofOn){
-  perfState.game=!!gameOn; perfState.spoof=!!spoofOn;
-  const cfg=perfCfg.game, sw=$(cfg.sw), row=$(cfg.row), st=$(cfg.st);
-  const any=!!(gameOn||spoofOn), both=!!(gameOn&&spoofOn);
-  if(sw){sw.dataset.silent='1';sw.checked=any;setTimeout(()=>{delete sw.dataset.silent},0)}
-  if(row)row.classList.toggle('is-on',any);
-  if(st)st.textContent=both?cfg.on:(any?(cfg.partial||'Chưa đồng bộ'):cfg.off);
 }
 function perfApplyInfo(out){
   const txt=String(out||'');
@@ -2429,7 +2453,8 @@ function perfApplyInfo(out){
   const sp=txt.match(/SPOOF_INFO_GAME_SPOOF=(on|off)|INFO_GAME_SPOOF=(on|off)/);
   const gameOn=g?((g[1]||g[2])==='on'):perfState.game;
   const spoofOn=sp?((sp[1]||sp[2])==='on'):perfState.spoof;
-  if(g||sp)perfSetGameCombo(gameOn,spoofOn);
+  if(g)perfSet('game',gameOn);
+  if(sp)perfSet('spoof',spoofOn);
   if(c)perfSet('charge',(c[1]||c[2])==='on');
   if(sd)perfSet('shutdown',(sd[1]||sd[2])==='disabled');
 }
@@ -2445,51 +2470,75 @@ function perfConfirm(kind,wantOn){
     return confirm('CẢNH BÁO RỦI RO CAO — BƯỚC 1/2:\n\nTùy chọn này có thể làm máy ít tự ngắt khi quá nóng. Chỉ bật để test ngắn hạn và tự theo dõi nhiệt. Tiếp tục?');
   }
   if(kind==='game'){
-    return confirm('Bật Game Max + Spoof: chỉ áp dụng cho game trong danh sách. Hãy mở lại game để nhận thay đổi. Tiếp tục?');
+    return confirm('Bật Game Max: áp dụng overlay hiệu năng/nhiệt cho game hỗ trợ. Nên reboot sau khi đổi. Tiếp tục?');
+  }
+  if(kind==='spoof'){
+    return confirm('Bật Game Spoof: áp dụng profile/spoof và tương thích COPG riêng cho game hỗ trợ. Tiếp tục?');
   }
   const label=perfCfg[kind]?.label||'Hiệu năng';
   return confirm(`Bật ${label}: có thể làm máy nóng hơn hoặc hao pin hơn. Tiếp tục?`);
 }
 async function perfToggle(kind,wantOn){
   const label=perfCfg[kind]?.label||'Hiệu năng';
+  if(perfAnyBusy()){
+    perfSet(kind,perfState[kind]);
+    toast('Đang áp dụng');
+    return;
+  }
   if(kind==='shutdown'&&wantOn){
     if(!perfConfirm(kind,wantOn)){perfSet(kind,false);return;}
+    perfSetBusy(kind,true);
     const armed=await perfRunWithProgress('performance-shutdown-arm','Xác nhận bước 1','shutdown');
-    if(!armed){perfSet(kind,false);await quickRefresh(true);return;}
+    if(!armed){perfSet(kind,false);await perfReconcile();perfSetBusy(kind,false);return;}
     if(!confirm('XÁC NHẬN LẦN 2/2:\n\nBạn chắc chắn muốn tắt shutdown bảo vệ nhiệt?')){
-      perfSet(kind,false);await quickRefresh(true);return;
+      perfSet(kind,false);await perfReconcile();perfSetBusy(kind,false);return;
     }
     const ok=await perfRunWithProgress('performance-shutdown-confirm','Áp dụng shutdown nhiệt','shutdown');
     perfSet(kind,!!ok);
-    await quickRefresh(true);
+    await perfReconcile();
+    perfSetBusy(kind,false);
     if(ok)toast('Đã bật '+label);
     return;
   }
   if(!perfConfirm(kind,wantOn)){perfSet(kind,false);return;}
+  perfSetBusy(kind,true);
   if(kind==='game'){
-    let ok=false;
-    if(wantOn){
-      const okGame=await perfRunWithProgress('performance-game-enable','Bật Game Max','game');
-      const okSpoof=okGame ? await perfRunWithProgress('performance-spoof-enable','Bật Game Spoof','game') : false;
-      ok=!!(okGame&&okSpoof);
-    }else{
-      const okSpoof=await perfRunWithProgress('performance-spoof-disable','Tắt Game Spoof','game');
-      const okGame=await perfRunWithProgress('performance-game-disable','Tắt Game Max','game');
-      ok=!!(okSpoof&&okGame);
-    }
-    await quickRefresh(true);
+    perfSet('game',wantOn);
+    perfMiniSet('game',12,'Đang áp dụng Game Max',true);
+    const ok=await perfRunWithProgress(wantOn?'performance-game-enable':'performance-game-disable', wantOn?'Bật Game Max':'Tắt Game Max', 'game');
+    if(!ok)perfSet('game',!wantOn);
+    await perfReconcile();
+    perfSetBusy(kind,false);
+    if(ok)toast((wantOn?'Đã bật ':'Đã tắt ')+label);
+    return;
+  }
+  if(kind==='spoof'){
+    perfSet('spoof',wantOn);
+    perfMiniSet('spoof',12,'Đang áp dụng Game Spoof',true);
+    const ok=await perfRunWithProgress(wantOn?'performance-spoof-enable':'performance-spoof-disable', wantOn?'Bật Game Spoof':'Tắt Game Spoof', 'spoof');
+    if(!ok)perfSet('spoof',!wantOn);
+    await perfReconcile();
+    perfSetBusy(kind,false);
     if(ok)toast((wantOn?'Đã bật ':'Đã tắt ')+label);
     return;
   }
   let route='performance-status';
   if(kind==='charge') route=wantOn?'performance-charge-enable':'performance-charge-disable';
   else if(kind==='shutdown') route=wantOn?'performance-shutdown-enable':'performance-shutdown-disable';
+  if(kind==='charge'){
+    perfSet('charge',wantOn);
+    perfMiniSet('charge',12,'Đang áp dụng Sạc Max',true);
+  }
   const ok=await perfRunWithProgress(route, perfProgressTitle(route,label), kind);
-  await quickRefresh(true);
+  if(!ok)perfSet(kind,!wantOn);
+  await perfReconcile();
+  perfSetBusy(kind,false);
   if(ok)toast((wantOn?'Đã bật ':'Đã tắt ')+label);
 }
 const switchGameMax=$('#switchGameMax');
 if(switchGameMax)switchGameMax.onchange=()=>{if(switchGameMax.dataset.silent==='1')return;perfToggle('game',switchGameMax.checked)};
+const switchGameSpoof=$('#switchGameSpoof');
+if(switchGameSpoof)switchGameSpoof.onchange=()=>{if(switchGameSpoof.dataset.silent==='1')return;perfToggle('spoof',switchGameSpoof.checked)};
 const switchChargeMax=$('#switchChargeMax');
 if(switchChargeMax)switchChargeMax.onchange=()=>{if(switchChargeMax.dataset.silent==='1')return;perfToggle('charge',switchChargeMax.checked)};
 const switchThermalShutdown=$('#switchThermalShutdown');
@@ -2530,7 +2579,8 @@ async function quickRefresh(force=false){
     quickRefreshLastAt=now;
     dbSetCooldownState(false);
     dbSetTouch360State(false);
-    perfSetGameCombo(false,false);
+    perfSet('game',false);
+    perfSet('spoof',false);
     perfSet('charge',false);
     perfSet('shutdown',false);
     sysSet('dev',false);
@@ -2573,7 +2623,7 @@ async function sysToggle(kind,wantOn){
 /* === Hero quick-toggle click handlers === */
 function heroTileToggle(kind){
   if(running){toast('Đang chạy');return;}
-  const switchMap={touch:'#switchTouch360',game:'#switchGameMax',charge:'#switchChargeMax',shutdown:'#switchThermalShutdown'};
+  const switchMap={touch:'#switchTouch360',game:'#switchGameMax',spoof:'#switchGameSpoof',charge:'#switchChargeMax',shutdown:'#switchThermalShutdown'};
   if(switchMap[kind]){
     const sw=$(switchMap[kind]);
     if(sw){ sw.click(); }
@@ -2590,7 +2640,7 @@ document.querySelectorAll('[data-quick-toggle]').forEach(btn=>{
 
 /* === End Debloat module === */
 
-(async()=>{setHelp('debloat');await initKSU();await findBridge();await quickRefresh(true);setStatus('Sẵn sàng',false)})();
+(async()=>{setHelp('debloat');updateTaskCardVisibility();await initKSU();await findBridge();await quickRefresh(true);setStatus('Sẵn sàng',false)})();
 </script>
 </body>
 </html>
