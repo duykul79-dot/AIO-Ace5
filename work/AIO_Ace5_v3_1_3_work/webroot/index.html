@@ -1473,10 +1473,6 @@ main{display:block}
           <span id="cleanupProgressCounter">0 / 1</span>
           <span id="cleanupProgressPkg" class="progress-meta-pkg">Đang chuẩn bị...</span>
         </div>
-        <div class="cleanup-live-log hidden" id="cleanupLiveLog">
-          <div class="cleanup-live-log-title">Realtime log</div>
-          <div class="cleanup-live-log-body" id="cleanupLiveLogBody">Đang chờ log...</div>
-        </div>
       </div>
     </section>
 
@@ -1760,6 +1756,8 @@ const BRIDGES=[
 const CLEANUP_MODES=new Set(['clean','modules','boost','dalvik','network','all']);
 let bridge='sh '+BRIDGES[0], bridgeInfoOut='', ksuFn=null, running=false, sid=null, timer=null, started=0, activeMod='', activeTab='debloat', batteryLines=[];
 let lastProgressKey='', lastProgressAt=0, lastHeartbeatAt=0, lastOutputAt=0, maxRuntimeWarned=false, visibleInPoll=0, backendRunStarted=false;
+let quickRefreshInFlight=false, quickRefreshLastAt=0, quickRefreshOffline=false;
+const QUICK_REFRESH_MIN_MS=2500;
 const $=s=>document.querySelector(s);
 const log=$('#log');
 const counts={ok:0,warn:0,err:0,skip:0};
@@ -2027,7 +2025,7 @@ async function initKSU(){
   }
 }
 async function sh(cmd){return ksuFn?ksuFn(cmd):{errno:0,stdout:'',stderr:''}}
-async function findBridge(){if(!ksuFn)return;for(const p of BRIDGES){const r=await sh('sh '+p+' --info');if((r.stdout||'').includes('SCRIPT_OK=1')){bridge='sh '+p;bridgeInfoOut=String(r.stdout||'');break}}}
+async function findBridge(){if(!ksuFn)return;for(const p of BRIDGES){const r=await sh(`[ -r ${p} ] && echo SCRIPT_OK=1`);if((r.stdout||'').includes('SCRIPT_OK=1')){bridge='sh '+p;break}}}
 async function run(mod){
   if(running) { toast('Đang chạy'); return false; }
   activeMod=mod; started=Date.now(); running=true; sid=null; visibleInPoll=0; lastHeartbeatAt=0; lastOutputAt=started; maxRuntimeWarned=false; lastProgressKey=''; lastProgressAt=0; backendRunStarted=false;
@@ -2099,6 +2097,7 @@ document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
   $('#sub').textContent=activeTab==='battery'?'Pin':(activeTab==='cleanup'?'Dọn rác':(activeTab==='performance'?'Hiệu năng':'Debloat'));
   $('#termTitle').textContent='AIO Ace5 - '+$('#sub').textContent+' - sẵn sàng';
   setHelp(activeTab);
+  quickRefresh(false);
 });
 document.querySelectorAll('[data-mod]').forEach(b=>b.onclick=()=>run(b.dataset.mod));
 $('#btnBattery').onclick=()=>run('battery-run');
@@ -2315,7 +2314,7 @@ if(switchCooldown) switchCooldown.onchange=async()=>{
     return;
   }
   const ok=await dbRun(wantOn?'cooldown-on':'cooldown-off', wantOn?'debloat-cooldown-enable':'debloat-cooldown-disable');
-  dbSetCooldownState(ok ? wantOn : !wantOn);
+  await quickRefresh(true);
 };
 const switchTouch360=$('#switchTouch360');
 if(switchTouch360) switchTouch360.onchange=async()=>{
@@ -2335,7 +2334,7 @@ if(switchTouch360) switchTouch360.onchange=async()=>{
   }finally{
     appendVisible=origAppend;
   }
-  dbSetTouch360State(ok ? wantOn : !wantOn, dbState.summaryTouch360Worker);
+  await quickRefresh(true);
 };
 
 /* === Performance tab === */
@@ -2451,13 +2450,13 @@ async function perfToggle(kind,wantOn){
   if(kind==='shutdown'&&wantOn){
     if(!perfConfirm(kind,wantOn)){perfSet(kind,false);return;}
     const armed=await perfRunWithProgress('performance-shutdown-arm','Xác nhận bước 1','shutdown');
-    if(!armed){perfSet(kind,false);await perfRefresh();return;}
+    if(!armed){perfSet(kind,false);await quickRefresh(true);return;}
     if(!confirm('XÁC NHẬN LẦN 2/2:\n\nBạn chắc chắn muốn tắt shutdown bảo vệ nhiệt?')){
-      perfSet(kind,false);await perfRefresh();return;
+      perfSet(kind,false);await quickRefresh(true);return;
     }
     const ok=await perfRunWithProgress('performance-shutdown-confirm','Áp dụng shutdown nhiệt','shutdown');
     perfSet(kind,!!ok);
-    await perfRefresh();
+    await quickRefresh(true);
     if(ok)toast('Đã bật '+label);
     return;
   }
@@ -2473,7 +2472,7 @@ async function perfToggle(kind,wantOn){
       const okGame=await perfRunWithProgress('performance-game-disable','Tắt Game Max','game');
       ok=!!(okSpoof&&okGame);
     }
-    await perfRefresh();
+    await quickRefresh(true);
     if(ok)toast((wantOn?'Đã bật ':'Đã tắt ')+label);
     return;
   }
@@ -2481,8 +2480,7 @@ async function perfToggle(kind,wantOn){
   if(kind==='charge') route=wantOn?'performance-charge-enable':'performance-charge-disable';
   else if(kind==='shutdown') route=wantOn?'performance-shutdown-enable':'performance-shutdown-disable';
   const ok=await perfRunWithProgress(route, perfProgressTitle(route,label), kind);
-  await perfRefresh();
-  perfSet(kind, ok ? wantOn : !wantOn);
+  await quickRefresh(true);
   if(ok)toast((wantOn?'Đã bật ':'Đã tắt ')+label);
 }
 const switchGameMax=$('#switchGameMax');
@@ -2517,6 +2515,42 @@ async function sysRefresh(){
   const r=await sh(`${bridge} --info`);
   sysApplyInfo(String(r.stdout||''));
 }
+async function quickRefresh(force=false){
+  const now=Date.now();
+  if(quickRefreshInFlight) return false;
+  if(!force && now-quickRefreshLastAt<QUICK_REFRESH_MIN_MS) return false;
+  if(!ksuFn){
+    if(quickRefreshOffline) return false;
+    quickRefreshOffline=true;
+    quickRefreshLastAt=now;
+    dbSetCooldownState(false);
+    dbSetTouch360State(false);
+    perfSetGameCombo(false,false);
+    perfSet('charge',false);
+    perfSet('shutdown',false);
+    sysSet('dev',false);
+    sysSet('usb',false);
+    if(window.aioRefreshHero) window.aioRefreshHero();
+    return false;
+  }
+  quickRefreshInFlight=true;
+  try{
+    const r=await sh(`${bridge} --quick-status`);
+    const out=String(r.stdout||'');
+    if(!out) return false;
+    bridgeInfoOut=out;
+    dbApplyInfo(out);
+    perfApplyInfo(out);
+    sysApplyInfo(out);
+    if(window.aioRefreshHero) window.aioRefreshHero();
+    return true;
+  }catch(e){
+    return false;
+  }finally{
+    quickRefreshLastAt=Date.now();
+    quickRefreshInFlight=false;
+  }
+}
 async function sysToggle(kind,wantOn){
   const cfg=sysCfg[kind]; if(!cfg) return;
   if(running){toast('Đang chạy');return;}
@@ -2527,7 +2561,7 @@ async function sysToggle(kind,wantOn){
   let ok=false;
   try{ ok=await run(route); }
   finally{ if(tile) tile.classList.remove('is-busy'); }
-  await sysRefresh();
+  await quickRefresh(true);
   if(ok) toast((wantOn?'Đã bật ':'Đã tắt ')+cfg.label);
 }
 
@@ -2551,7 +2585,7 @@ document.querySelectorAll('[data-quick-toggle]').forEach(btn=>{
 
 /* === End Debloat module === */
 
-(async()=>{setHelp('debloat');await initKSU();await findBridge();dbApplyInfo(bridgeInfoOut);perfApplyInfo(bridgeInfoOut);sysApplyInfo(bridgeInfoOut);setStatus('Sẵn sàng',false)})();
+(async()=>{setHelp('debloat');await initKSU();await findBridge();await quickRefresh(true);setStatus('Sẵn sàng',false)})();
 </script>
 </body>
 </html>

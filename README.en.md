@@ -175,15 +175,15 @@ After uninstalling, reboot the device to let the system return to a stable state
 
 ```text
 workspace_v3_1
-├─ docs
-│  └─ CHANGELOG.md
-├─ input
-├─ output
-├─ work
-│  └─ AIO_Ace5_v3_1_3_work
-├─ README.md
-├─ README.en.md
-└─ .gitignore
++-- docs
+|   +-- CHANGELOG.md
++-- input
++-- output
++-- work
+|   +-- AIO_Ace5_v3_1_3_work
++-- README.md
++-- README.en.md
++-- .gitignore
 ```
 
 Description:

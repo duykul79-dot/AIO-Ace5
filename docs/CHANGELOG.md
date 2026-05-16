@@ -1,5 +1,15 @@
 ﻿# Changelog
 
+## v3.1.4 - quick switch state and update metadata
+
+### Changed
+
+- Fixed quick switch real state scan after first flash/update.
+- USB Debug now reads real `adb_enabled` state.
+- Quick switches refresh after toggle from backend state.
+- Added module manager update metadata via `updateJson`/`update.json`.
+- Kept no in-module downloader/network script.
+
 ## v3.1.3 - keobamien UI/log popup cleanup
 
 ### Changed

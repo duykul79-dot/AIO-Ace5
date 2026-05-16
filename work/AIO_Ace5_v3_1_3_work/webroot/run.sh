@@ -55,13 +55,38 @@ _pid_belongs_to_session() {
     case "$_cmd" in *sh*|*run.sh*|*"$_mod"*|*"$_sid"*) return 0 ;; esac
     return 1
 }
+_flag_state() { [ -f "$1" ] && printf 'on' || printf 'off'; }
+_pid_state() {
+    _pidfile="$1"
+    _pid=""
+    [ -f "$_pidfile" ] && _pid="$(cat "$_pidfile" 2>/dev/null | tr -d ' \t\r\n')"
+    case "$_pid" in ''|*[!0-9]*) printf 'stopped'; return ;; esac
+    kill -0 "$_pid" 2>/dev/null && printf 'running' || printf 'stopped'
+}
+_settings_state() {
+    _key="$1"
+    _v="$(settings get global "$_key" 2>/dev/null | tr -d ' \t\r\n')"
+    [ "$_v" = "1" ] && printf 'on' || printf 'off'
+}
 
 case "${1:-}" in
+  --quick-status)
+    printf 'INFO_COOLDOWN=%s\n' "$(_flag_state "$_MODULE_ROOT/bin/cooldown_enabled.flag")"
+    printf 'INFO_TOUCH360=%s\n' "$(_flag_state "$_MODULE_ROOT/bin/touch_360_enabled.flag")"
+    printf 'INFO_TOUCH360_WORKER=%s\n' "$(_pid_state "$_MODULE_ROOT/bin/touch_360_worker.pid")"
+    printf 'INFO_GAME_MAX=%s\n' "$(_flag_state "$_MODULE_ROOT/bin/game_max_enabled.flag")"
+    printf 'INFO_GAME_SPOOF=%s\n' "$(_flag_state "$_MODULE_ROOT/bin/game_spoof_enabled.flag")"
+    printf 'INFO_CHARGE_MAX=%s\n' "$(_flag_state "$_MODULE_ROOT/bin/charge_max_enabled.flag")"
+    [ -f "$_MODULE_ROOT/bin/thermal_shutdown_disable.flag" ] && printf 'INFO_SHUTDOWN_PROTECT=disabled\n' || printf 'INFO_SHUTDOWN_PROTECT=enabled\n'
+    printf 'INFO_DEV_OPTIONS=%s\n' "$(_settings_state development_settings_enabled)"
+    printf 'INFO_USB_DEBUG=%s\n' "$(_settings_state adb_enabled)"
+    ;;
+
   --info)
     printf "MODULE_ROOT=%s\n" "$_MODULE_ROOT"
     printf "SCRIPT=%s\n" "$_MAIN_SCRIPT"
     printf "BRIDGE=%s\n" "$_SELF"
-    printf "VERSION=v3.1\n"
+    printf "VERSION=v3.1.4\n"
     [ -f "$_MAIN_SCRIPT" ] && printf "SCRIPT_OK=1\n" || printf "SCRIPT_OK=0\n"
     [ -f "$_BATT_SCRIPT" ] && printf "BATTERY_OK=1\n" || printf "BATTERY_OK=0\n"
     [ -f "$_DBTL_SCRIPT" ] && printf "DBTL_OK=1\n" || printf "DBTL_OK=0\n"
@@ -216,8 +241,8 @@ case "${1:-}" in
     ;;
 
   ""|*)
-    printf "[ERR] run.sh v3.1: tham so khong hop le: %s\n" "${1:-<none>}"
-    printf "  --info / --status / --start <mod> / --poll <sid> <N> / --stop <sid> / --module <mod>\n"
-    printf "  mod: clean|modules|boost|dalvik|network|all|battery-run|battery-show-latest|battery-list|debloat-info|debloat-count|debloat-apply-recommended|debloat-apply-deep|debloat-restore-all|debloat-cooldown-enable|debloat-cooldown-disable|debloat-touch360-enable|debloat-touch360-disable|performance-game-enable|performance-game-disable|performance-charge-enable|performance-charge-disable|performance-shutdown-arm|performance-shutdown-confirm|performance-shutdown-enable|performance-shutdown-disable|performance-spoof-enable|performance-spoof-disable|performance-status|reboot-device\n"
+    printf "[ERR] run.sh v3.1.4: tham so khong hop le: %s\n" "${1:-<none>}"
+    printf "  --info / --quick-status / --status / --start <mod> / --poll <sid> <N> / --stop <sid> / --module <mod>\n"
+    printf "  mod: clean|modules|boost|dalvik|network|all|battery-run|battery-show-latest|battery-list|debloat-info|debloat-count|debloat-apply-recommended|debloat-apply-deep|debloat-restore-all|debloat-cooldown-enable|debloat-cooldown-disable|debloat-touch360-enable|debloat-touch360-disable|performance-game-enable|performance-game-disable|performance-charge-enable|performance-charge-disable|performance-shutdown-arm|performance-shutdown-confirm|performance-shutdown-enable|performance-shutdown-disable|performance-spoof-enable|performance-spoof-disable|performance-status|system-devopts-enable|system-devopts-disable|system-usbdebug-enable|system-usbdebug-disable|system-status|reboot-device\n"
     exit 1 ;;
 esac
