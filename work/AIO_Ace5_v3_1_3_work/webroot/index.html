@@ -734,6 +734,9 @@ main{display:block}
 }
 .battery-empty-ico{font-size:26px;line-height:1;flex:0 0 auto;color:var(--primary)}
 .battery-empty-ico .iso{font-size:26px}
+#debloatProgressCard,
+#cleanupProgressCard,
+#batteryTaskProgressCard{display:none!important}
 .report-header{
   background:var(--bg-soft);
   border:1px solid var(--hairline);
@@ -746,16 +749,18 @@ main{display:block}
 }
 .report-suspect-val{font-size:15px;font-weight:700;color:var(--ink)}
 .bat-kpis{
-  display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px;
+  display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:12px;
 }
 .bat-kpi{
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  padding:10px 4px;
+  grid-column:span 2;
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;
+  min-height:58px;padding:10px 11px;
   border:1px solid var(--hairline);border-radius:var(--r-md);
   background:var(--bg-soft);
 }
-.bat-kpi-val{font-size:14px;font-weight:800;color:var(--primary)}
-.bat-kpi-lbl{font-size:9.5px;color:var(--muted);font-weight:600;letter-spacing:.02em;text-align:center;line-height:1.1}
+.bat-kpi:nth-child(n+4){grid-column:span 3}
+.bat-kpi-val{font-size:15px;font-weight:850;color:var(--primary);line-height:1.1;font-variant-numeric:tabular-nums}
+.bat-kpi-lbl{font-size:10.5px;color:var(--muted);font-weight:650;letter-spacing:.01em;line-height:1.2}
 .table-wrap{
   border:1px solid var(--hairline);border-radius:var(--r-md);
   overflow-x:auto;-webkit-overflow-scrolling:touch;
@@ -1516,7 +1521,7 @@ main{display:block}
       <section class="card hidden" id="batteryReport">
         <div class="card-eyebrow">Báo cáo Pin</div>
         <div class="report-header">
-          <div class="report-suspect-lbl">Tác vụ nghi ngờ nhất</div>
+          <div class="report-suspect-lbl">Tác vụ tốn pin nhất</div>
           <div class="report-suspect-val" id="batteryTop">Chưa có dữ liệu</div>
         </div>
         <div class="bat-kpis">
