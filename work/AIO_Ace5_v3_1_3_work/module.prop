@@ -1,8 +1,8 @@
 id=cleanup_ace5_v10_5
 name=AIO Ace5 V3.1
-version=v3.1.6
-versionCode=31600
+version=v3.1.7
+versionCode=31700
 author=@keobamien
-description=AIO Ace5 V3.1.6: WebUI tối ưu, 6 công tắc nhanh, Game Max/Game Spoof tách riêng, Pin/Dọn rác/Debloat/Hiệu năng.
+description=AIO Ace5 V3.1.7: fix rollback Cooldown, 6 công tắc nhanh, Game Max/Game Spoof tách riêng, Pin/Dọn rác/Debloat/Hiệu năng.
 updateJson=https://github.com/duykul79-dot/AIO-Ace5/releases/latest/download/update.json
 minKernelSU=11580

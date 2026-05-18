@@ -96,7 +96,7 @@ case "${1:-}" in
     printf "MODULE_ROOT=%s\n" "$_MODULE_ROOT"
     printf "SCRIPT=%s\n" "$_MAIN_SCRIPT"
     printf "BRIDGE=%s\n" "$_SELF"
-    printf "VERSION=v3.1.4\n"
+    printf "VERSION=v3.1.7\n"
     [ -f "$_MAIN_SCRIPT" ] && printf "SCRIPT_OK=1\n" || printf "SCRIPT_OK=0\n"
     [ -f "$_BATT_SCRIPT" ] && printf "BATTERY_OK=1\n" || printf "BATTERY_OK=0\n"
     [ -f "$_DBTL_SCRIPT" ] && printf "DBTL_OK=1\n" || printf "DBTL_OK=0\n"
@@ -251,7 +251,7 @@ case "${1:-}" in
     ;;
 
   ""|*)
-    printf "[ERR] run.sh v3.1.4: tham so khong hop le: %s\n" "${1:-<none>}"
+    printf "[ERR] run.sh v3.1.7: tham so khong hop le: %s\n" "${1:-<none>}"
     printf "  --info / --quick-status / --status / --start <mod> / --poll <sid> <N> / --stop <sid> / --module <mod>\n"
     printf "  mod: clean|modules|boost|dalvik|network|all|battery-run|battery-show-latest|battery-list|debloat-info|debloat-count|debloat-apply-recommended|debloat-apply-deep|debloat-restore-all|debloat-cooldown-enable|debloat-cooldown-disable|debloat-touch360-enable|debloat-touch360-disable|performance-game-enable|performance-game-disable|performance-charge-enable|performance-charge-disable|performance-shutdown-arm|performance-shutdown-confirm|performance-shutdown-enable|performance-shutdown-disable|performance-spoof-enable|performance-spoof-disable|performance-status|system-devopts-enable|system-devopts-disable|system-usbdebug-enable|system-usbdebug-disable|system-status|reboot-device\n"
     exit 1 ;;

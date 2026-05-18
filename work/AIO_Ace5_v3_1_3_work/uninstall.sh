@@ -7,6 +7,8 @@ BACKUP_FILE="${MODDIR}/bin/debloat_backup.list"
 FLAG="${MODDIR}/bin/cooldown_enabled.flag"
 PERF_SCRIPT="${MODDIR}/bin/aio_performance.sh"
 SPOOF_SCRIPT="${MODDIR}/bin/aio_game_spoof.sh"
+SPOOF_STATE_DIR="/data/adb/aio_ace5/state"
+SPOOF_STATE_FLAG="${SPOOF_STATE_DIR}/game_spoof_enabled.flag"
 TOUCH360_FLAG="${MODDIR}/bin/touch_360_enabled.flag"
 TOUCH360_PID="${MODDIR}/bin/touch_360_worker.pid"
 PAYLOAD="${MODDIR}/bin/extreme_gt_payload_generated"
@@ -154,6 +156,8 @@ rm -rf "${MODDIR}/bin/charge_max_state" "$PAYLOAD" 2>/dev/null
 [ -f "$SPOOF_SCRIPT" ] && /system/bin/sh "$SPOOF_SCRIPT" --disable >/dev/null 2>&1
 kill_pidfile "$COPG_CONTROLLER_PID"
 rm -f "${MODDIR}/bin/game_spoof_enabled.flag" "${MODDIR}/bin/game_spoof_config.json" "${MODDIR}/bin/game_spoof_copg_compat.json" 2>/dev/null
+rm -f "$SPOOF_STATE_FLAG" 2>/dev/null
+rmdir "$SPOOF_STATE_DIR" /data/adb/aio_ace5 2>/dev/null
 rm -f /data/local/tmp/aio_game_spoof_config.json /data/local/tmp/aio_game_spoof_copg_compat.json /data/local/tmp/aio_game_spoof_cpuinfo.txt /data/local/tmp/aio_game_spoof_copg_controller.pid 2>/dev/null
 rm -f /data/local/tmp/aio_game_spoof.log 2>/dev/null
 remove_aio_copg_shim

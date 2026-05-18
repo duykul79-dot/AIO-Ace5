@@ -5,6 +5,7 @@ MODDIR="${0%/*}/.."
 CATALOG_FILE="$MODDIR/bin/debloat_catalog.conf"
 BACKUP_FILE="$MODDIR/bin/debloat_backup.list"
 COOLDOWN_FLAG="$MODDIR/bin/cooldown_enabled.flag"
+COOLDOWN_BACKUP_FILE="$MODDIR/bin/cooldown_backup.list"
 TOUCH360_FLAG="$MODDIR/bin/touch_360_enabled.flag"
 TOUCH360_WORKER="$MODDIR/bin/touch_360_worker.sh"
 TOUCH360_PID="$MODDIR/bin/touch_360_worker.pid"
@@ -78,8 +79,32 @@ _backup_remove() {
         || rm -f "$_tmp" 2>/dev/null
 }
 
+_cooldown_backup_has() {
+    _type="$1"; _name="$2"
+    [ -f "$COOLDOWN_BACKUP_FILE" ] || return 1
+    awk -F'|' -v t="$_type" -v n="$_name" '$1==t && $2==n{found=1} END{exit !found}' "$COOLDOWN_BACKUP_FILE" 2>/dev/null
+}
+
+_cooldown_backup_add() {
+    _type="$1"; _name="$2"; _state="$3"; _value="$4"
+    _cooldown_backup_has "$_type" "$_name" && return 0
+    if [ "$_type" = "PROP" ]; then
+        printf 'PROP|%s|%s|%s\n' "$_name" "$_state" "$_value" >> "$COOLDOWN_BACKUP_FILE"
+    else
+        printf 'PKG|%s|%s\n' "$_name" "$_state" >> "$COOLDOWN_BACKUP_FILE"
+    fi
+}
+
 _pkg_exists() {
     pm path "$1" >/dev/null 2>&1 || pm list packages -u 2>/dev/null | grep -qxF "package:$1"
+}
+
+_pkg_state() {
+    _pkg="$1"
+    _pkg_exists "$_pkg" || { printf 'not_installed'; return 0; }
+    pm list packages -d --user 0 "$_pkg" 2>/dev/null | grep -qxF "package:$_pkg" && { printf 'disabled'; return 0; }
+    pm list packages -e --user 0 "$_pkg" 2>/dev/null | grep -qxF "package:$_pkg" && { printf 'enabled'; return 0; }
+    printf 'unknown'
 }
 
 _pkg_installed_user0() {
@@ -104,33 +129,91 @@ _cooldown_unmount_stubs() {
 }
 
 _cooldown_restore_props() {
-    for _kv in \
-        persist.logd.enable=1 \
-        persist.logd.logpersistd.enable=1 \
-        persist.logd.flowctrl.on=1 \
-        persist.logd.size=256K \
-        persist.ota.auto_download=1 \
-        persist.sys.recovery_update=1 \
-        persist.sys.coupdate=1 \
-        persist.sys.oplus.ad_enable=1 \
-        persist.sys.oplus.personalized_ad=1 \
-        persist.ad.track=1 \
-        persist.sys.enable_ad_logdump=1 \
-        persist.sys.usage_stat_enable=1 \
-        persist.oppo.collect=1 \
-        persist.sys.oppo.junkmonitor=true \
-        persist.sys.preload=1 \
-        persist.vendor.enable.preload=true \
-        persist.sys.monitor=1 \
-        persist.sys.hotstart=1 \
-        sys.oplus.respreload.vipcsdk.enabled=true \
-        persist.sys.oplus.theia_screen_monitor.disabled=0
-    do
-        _k="${_kv%%=*}"; _v="${_kv#*=}"
-        setprop "$_k" "$_v" 2>/dev/null && log_ok "Cooldown prop restored: $_k=$_v" || log_skip "Cooldown prop skipped: $_k"
-    done
+    if [ -f "$COOLDOWN_BACKUP_FILE" ]; then
+        while IFS='|' read -r _type _k _state _v; do
+            [ "$_type" = "PROP" ] || continue
+            case "$_k" in ''|*[!a-zA-Z0-9_.-]*) log_skip "Cooldown prop invalid: $_k"; continue ;; esac
+            case "$_state" in
+                value) setprop "$_k" "$_v" 2>/dev/null && log_ok "Cooldown prop restored: $_k=$_v" || log_skip "Cooldown prop skipped: $_k" ;;
+                empty) setprop "$_k" "" 2>/dev/null && log_ok "Cooldown prop restored empty: $_k" || log_skip "Cooldown empty prop skipped: $_k" ;;
+                *) log_skip "Cooldown prop unknown, skip: $_k" ;;
+            esac
+        done < "$COOLDOWN_BACKUP_FILE"
+    else
+        log_warn "missing cooldown backup; skip hardcoded prop restore"
+    fi
     setprop ctl.start logd 2>/dev/null && log_ok "Cooldown service start: logd" || log_skip "Cooldown service start skipped: logd"
     setprop ctl.start update_engine 2>/dev/null && log_ok "Cooldown service start: update_engine" || log_skip "Cooldown service start skipped: update_engine"
+}
+
+_cooldown_prop_exists() {
+    _key="$1"
+    getprop 2>/dev/null | grep -F "[$_key]:" >/dev/null 2>&1
+}
+
+_cooldown_prop_keys() {
+    printf '%s\n' \
+        persist.logd.enable \
+        persist.logd.logpersistd.enable \
+        persist.logd.flowctrl.on \
+        persist.logd.size \
+        persist.ota.auto_download \
+        persist.sys.recovery_update \
+        persist.sys.coupdate \
+        persist.sys.sota.state \
+        sys.oplus.production.wifi.ota \
+        persist.sys.oplus.ad_enable \
+        persist.sys.oplus.personalized_ad \
+        persist.ad.track \
+        persist.sys.enable_ad_logdump \
+        persist.sys.usage_stat_enable \
+        persist.oppo.collect \
+        persist.sys.oppo.junkmonitor \
+        persist.sys.preload \
+        persist.vendor.enable.preload \
+        persist.sys.monitor \
+        persist.sys.hotstart \
+        sys.oplus.respreload.vipcsdk.enabled \
+        persist.sys.oplus.theia_screen_monitor.disabled \
+        persist.sys.fflag.override.settings_enable_monitor_phantom_procs
+}
+
+_cooldown_snapshot() {
+    _ensure_catalog
+    mkdir -p "${COOLDOWN_BACKUP_FILE%/*}" 2>/dev/null
+    if [ -f "$COOLDOWN_FLAG" ]; then
+        if [ -s "$COOLDOWN_BACKUP_FILE" ]; then
+            log_skip "Cooldown already enabled; keep existing backup: $COOLDOWN_BACKUP_FILE"
+        else
+            log_warn "Cooldown already enabled but backup missing; do not snapshot current changed state"
+        fi
+        return 0
+    fi
+    : > "$COOLDOWN_BACKUP_FILE" 2>/dev/null || { log_warn "cannot write cooldown backup"; return 0; }
+    log_info "Cooldown backup path: $COOLDOWN_BACKUP_FILE"
+    while IFS='|' read -r _pkg _section _action _default _label _desc; do
+        case "$_pkg" in ''|\#*) continue ;; esac
+        [ "$_section" = "cooldown" ] || continue
+        if ! _is_valid_pkg "$_pkg"; then
+            log_warn "skip invalid package name from catalog: $_pkg"
+            continue
+        fi
+        _cooldown_backup_add PKG "$_pkg" "$(_pkg_state "$_pkg")"
+    done < "$CATALOG_FILE"
+    _cooldown_prop_keys | while IFS= read -r _k; do
+        if _cooldown_prop_exists "$_k"; then
+            _v="$(getprop "$_k" 2>/dev/null)"
+            if [ -n "$_v" ]; then
+                _cooldown_backup_add PROP "$_k" value "$_v"
+            else
+                _cooldown_backup_add PROP "$_k" empty ""
+            fi
+        else
+            _cooldown_backup_add PROP "$_k" unknown ""
+        fi
+    done
+    log_info "Cooldown snapshot packages: $(awk -F'|' '$1=="PKG"{n++} END{print n+0}' "$COOLDOWN_BACKUP_FILE" 2>/dev/null)"
+    log_info "Cooldown snapshot props: $(awk -F'|' '$1=="PROP"{n++} END{print n+0}' "$COOLDOWN_BACKUP_FILE" 2>/dev/null)"
 }
 
 _summary() {
@@ -407,6 +490,7 @@ _cooldown_enable() {
     _quiet="$1"
     _START_TS="$(_now)"; _OK=0; _WARN=0; _ERR=0; _SKIP=0; _TOTAL=0
     _ensure_catalog; _ensure_backup
+    _cooldown_snapshot
     _count="$(_section_count cooldown)"
     _run_catalog cooldown "$_count" cooldown 0
     : > "$COOLDOWN_FLAG" 2>/dev/null || log_warn "cannot write cooldown flag"
@@ -418,31 +502,53 @@ _cooldown_disable() {
     _quiet="$1"
     _START_TS="$(_now)"; _OK=0; _WARN=0; _ERR=0; _SKIP=0; _TOTAL=0
     _ensure_catalog; _ensure_backup
-    _count="$(_section_count cooldown)"
+    _count="$(awk -F'|' '$1=="PKG"{n++} END{print n+0}' "$COOLDOWN_BACKUP_FILE" 2>/dev/null)"
+    [ "$_count" -gt 0 ] 2>/dev/null || _count="$(_section_count cooldown)"
     _idx=0
-    while IFS='|' read -r _pkg _section _action _default _label _desc; do
-        case "$_pkg" in ''|\#*) continue ;; esac
-        if ! _is_valid_pkg "$_pkg"; then log_warn "skip invalid package name from catalog: $_pkg"; _SKIP=$((_SKIP + 1)); continue; fi
-        [ "$_section" = "cooldown" ] || continue
-        _idx=$((_idx + 1))
-        log_run "$_idx/$_count $_pkg"
-        _TOTAL=$((_TOTAL + 1))
-        if ! _pkg_exists "$_pkg"; then
-            log_skip "$_pkg: not found / not installed"
-            _SKIP=$((_SKIP + 1))
-            _backup_remove "$_pkg"
-            continue
-        fi
-        _pm_enable "$_pkg"; _rc=$?
-        case "$_rc" in
-            0) _backup_remove "$_pkg"; log_ok "$_pkg"; _OK=$((_OK + 1)) ;;
-            2) log_skip "$_pkg: not found / not installed"; _SKIP=$((_SKIP + 1)); _backup_remove "$_pkg" ;;
-            *) _ERR=$((_ERR + 1)) ;;
-        esac
-    done < "$CATALOG_FILE"
-    rm -f "$COOLDOWN_FLAG" 2>/dev/null
+    if [ -f "$COOLDOWN_BACKUP_FILE" ] && [ -s "$COOLDOWN_BACKUP_FILE" ]; then
+        log_info "Cooldown restore backup: $COOLDOWN_BACKUP_FILE"
+        while IFS='|' read -r _type _pkg _state _rest; do
+            [ "$_type" = "PKG" ] || continue
+            if ! _is_valid_pkg "$_pkg"; then log_warn "skip invalid package name from cooldown backup: $_pkg"; _SKIP=$((_SKIP + 1)); continue; fi
+            _idx=$((_idx + 1))
+            log_run "$_idx/$_count $_pkg"
+            _TOTAL=$((_TOTAL + 1))
+            case "$_state" in
+                enabled)
+                    _pm_enable "$_pkg"; _rc=$?
+                    case "$_rc" in
+                        0) log_ok "$_pkg: restored enabled"; _OK=$((_OK + 1)) ;;
+                        2) log_skip "$_pkg: not found / not installed"; _SKIP=$((_SKIP + 1)) ;;
+                        *) _ERR=$((_ERR + 1)) ;;
+                    esac
+                    ;;
+                disabled)
+                    _pm_disable "$_pkg"; _rc=$?
+                    case "$_rc" in
+                        0) log_ok "$_pkg: restored disabled"; _OK=$((_OK + 1)) ;;
+                        2) log_skip "$_pkg: not found / not installed"; _SKIP=$((_SKIP + 1)) ;;
+                        *) _ERR=$((_ERR + 1)) ;;
+                    esac
+                    ;;
+                not_installed)
+                    log_skip "$_pkg: was not installed before Cooldown"
+                    _SKIP=$((_SKIP + 1))
+                    ;;
+                *)
+                    log_skip "$_pkg: unknown original state"
+                    _SKIP=$((_SKIP + 1))
+                    ;;
+            esac
+        done < "$COOLDOWN_BACKUP_FILE"
+    else
+        log_warn "missing cooldown backup; skip package restore to avoid wrong state"
+    fi
     _cooldown_unmount_stubs
     _cooldown_restore_props
+    if [ -f "$COOLDOWN_BACKUP_FILE" ]; then
+        mv "$COOLDOWN_BACKUP_FILE" "$COOLDOWN_BACKUP_FILE.last" 2>/dev/null || log_skip "Cooldown backup archive skipped"
+    fi
+    rm -f "$COOLDOWN_FLAG" 2>/dev/null
     [ "$_quiet" = "quiet" ] || _summary
     [ "$_ERR" -gt 0 ] && return 1 || return 0
 }

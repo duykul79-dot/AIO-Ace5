@@ -1,5 +1,14 @@
 # Changelog
 
+## v3.1.7 - cooldown rollback fix
+
+### Fixed
+
+- Snapshot Cooldown package and prop state before enabling.
+- Restore Cooldown from the snapshot instead of enabling every Cooldown package.
+- Keep packages that were disabled before Cooldown disabled after turning Cooldown off.
+- Skip not installed or unknown package states safely.
+
 ## v3.1.6 - separate Game Max and Game Spoof switches
 
 ### Changed
