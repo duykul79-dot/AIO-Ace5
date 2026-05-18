@@ -1,0 +1,9 @@
+﻿AIO Ace5 v3.1.7
+
+- Sửa lỗi Cooldown rollback trong tab Debloat.
+- Cooldown OFF khôi phục sát hơn trạng thái trước khi bật Cooldown.
+- Giữ bảng công tắc nhanh 6 tile: 360Hz, Game Max, Game Spoof, Sạc Max, Nhà phát triển, Gỡ lỗi USB.
+- Game Max và Game Spoof vẫn tách riêng.
+- WebUI vẫn dùng quick-status nhẹ để quét trạng thái.
+- Raw realtime log vẫn ẩn.
+- Khuyến nghị reboot sau khi flash/update module.
