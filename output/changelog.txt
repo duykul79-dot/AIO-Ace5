@@ -1,9 +1,12 @@
-﻿AIO Ace5 v3.1.7
+﻿AIO Ace5 v3.2.0
 
-- Sửa lỗi Cooldown rollback trong tab Debloat.
-- Cooldown OFF khôi phục sát hơn trạng thái trước khi bật Cooldown.
-- Giữ bảng công tắc nhanh 6 tile: 360Hz, Game Max, Game Spoof, Sạc Max, Nhà phát triển, Gỡ lỗi USB.
-- Game Max và Game Spoof vẫn tách riêng.
-- WebUI vẫn dùng quick-status nhẹ để quét trạng thái.
-- Raw realtime log vẫn ẩn.
-- Khuyến nghị reboot sau khi flash/update module.
+SHA256:
+514050f466cbce5c06c1fae86400491d6f00a54f7d1da8ef0c0fae23f70e6ee5
+
+Thay đổi chính:
+- Remake module Phân Tích Pin, phân tích pin tính từ LẦN RÚT SẠC GẦN NHẤT.
+- Thêm Bật/Tắt Log Debug hệ thống.
+- Remake Debloat App Logic: mạnh hơn, sạch hơn.
+- Sửa progress Dọn rác: Network hiển thị đúng là đang reset mạng.
+- UI AIO Ace5/13R tinh gọn hơn.
+- Cập nhật Donate Information.
