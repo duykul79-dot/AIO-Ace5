@@ -1,4 +1,4 @@
-# AIO Ace5
+﻿# AIO Ace5
 
 **AIO Ace5** is a customization module for **OnePlus Ace 5/13R** running **ColorOS / OPlus**, designed for rooted environments such as **KernelSU**, **Magisk**, and **APatch**.
 
@@ -136,7 +136,21 @@ Depending on the feature, logs may be written to temporary system locations or e
 
 ## Current Version
 
-**AIO Ace5 v3.1.3**
+**AIO Ace5 v3.2.0**
+
+Current release: **v3.2.0**
+
+SHA256:
+`514050f466cbce5c06c1fae86400491d6f00a54f7d1da8ef0c0fae23f70e6ee5`
+
+Main changes:
+- Remade Battery Analyzer; battery analysis is calculated from the **latest unplug cycle**.
+- Real battery capacity is read from OPlus `battery_fcc`.
+- Fixed **System Log Debug**: correctly toggles ROM logcat/logd.
+- Log Debug is independent from Cooldown.
+- Remade Debloat App Logic: stronger and cleaner.
+- Fixed Cleanup progress label: Network now shows reset-network progress correctly.
+- Cleaner AIO Ace5/13R UI.
 
 Highlights:
 
@@ -251,3 +265,4 @@ Recommendations:
 ## Disclaimer
 
 This module is provided for personal use, testing, and rooted-device customization. The author is not responsible for any damage, data loss, system failure, or other risks caused by using this module.
+

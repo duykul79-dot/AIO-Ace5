@@ -136,7 +136,21 @@ Tuỳ tính năng, log có thể được ghi trong các thư mục tạm của 
 
 ## Phiên bản hiện tại
 
-**AIO Ace5 v3.1.3**
+**AIO Ace5 v3.2.0**
+
+Bản phát hành hiện tại: **v3.2.0**
+
+SHA256:
+`514050f466cbce5c06c1fae86400491d6f00a54f7d1da8ef0c0fae23f70e6ee5`
+
+Điểm mới chính:
+- Remake module Phân Tích Pin, phân tích pin tính từ **lần rút sạc gần nhất**.
+- Dung lượng pin thực tế lấy từ OPlus `battery_fcc`.
+- Thêm/Bật lại đúng chức năng **Log Debug hệ thống**: bật/tắt ROM logcat/logd.
+- Log Debug độc lập với Cooldown.
+- Remake Debloat App Logic: mạnh hơn, sạch hơn.
+- Sửa progress Dọn rác: Network hiển thị đúng là đang reset mạng.
+- UI AIO Ace5/13R tinh gọn hơn.
 
 Thay đổi nổi bật:
 
@@ -251,3 +265,4 @@ Khuyến nghị:
 ## Disclaimer
 
 Module được cung cấp với mục đích cá nhân, kiểm thử và tuỳ biến thiết bị đã root. Tác giả không chịu trách nhiệm cho bất kỳ hư hỏng, mất dữ liệu, lỗi hệ thống hoặc rủi ro nào phát sinh từ việc sử dụng module.
+
