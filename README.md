@@ -136,31 +136,19 @@ Tuỳ tính năng, log có thể được ghi trong các thư mục tạm của 
 
 ## Phiên bản hiện tại
 
-**AIO Ace5 v3.2.0**
+**AIO Ace5 v3.2.1**
 
-Bản phát hành hiện tại: **v3.2.0**
+Bản phát hành hiện tại: **v3.2.1**
 
 SHA256:
-`514050f466cbce5c06c1fae86400491d6f00a54f7d1da8ef0c0fae23f70e6ee5`
+`dd0ed547e9bd7e6c92c5fe4a6c458a3f9b4f046e7ce7ffabbb7bb7dbf2000545`
 
 Điểm mới chính:
-- Remake module Phân Tích Pin, phân tích pin tính từ **lần rút sạc gần nhất**.
-- Dung lượng pin thực tế lấy từ OPlus `battery_fcc`.
-- Thêm/Bật lại đúng chức năng **Log Debug hệ thống**: bật/tắt ROM logcat/logd.
-- Log Debug độc lập với Cooldown.
-- Remake Debloat App Logic: mạnh hơn, sạch hơn.
-- Sửa progress Dọn rác: Network hiển thị đúng là đang reset mạng.
-- UI AIO Ace5/13R tinh gọn hơn.
+- Sửa lỗi Deep Debloat có thể làm Bluetooth không bật được.
+- Sửa quyền overlay/.replace để tránh lỗi mất app hệ thống sau debloat.
+- Cải thiện Restore toàn bộ để tự sửa trạng thái cho máy đã chạy bản lỗi.
 
-Thay đổi nổi bật:
-
-- Đổi hiển thị tác giả thành **@keobamien**.
-- Thiết kế lại giao diện realtime log.
-- Xoá khung realtime log cũ bị trùng trong tab Dọn rác.
-- Thêm popup khuyến nghị reboot sau khi chạy Dọn nhanh / Dọn toàn bộ thành công.
-- Bổ sung ghi chú rõ hơn về yêu cầu Zygisk.
-- Giữ nguyên backend logging/export.
-- Giữ nguyên logic chính của Debloat, Dọn rác, Pin và Hiệu năng.
+> Bản cập nhật khuyến nghị cho tất cả user v3.2.0, đặc biệt nếu đã từng chạy Deep Debloat. Sau khi cập nhật, nếu từng bị lỗi Bluetooth hoặc app hệ thống, hãy bấm **Restore toàn bộ** rồi reboot.
 
 ---
 

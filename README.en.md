@@ -136,31 +136,19 @@ Depending on the feature, logs may be written to temporary system locations or e
 
 ## Current Version
 
-**AIO Ace5 v3.2.0**
+**AIO Ace5 v3.2.1**
 
-Current release: **v3.2.0**
+Current release: **v3.2.1**
 
 SHA256:
-`514050f466cbce5c06c1fae86400491d6f00a54f7d1da8ef0c0fae23f70e6ee5`
+`dd0ed547e9bd7e6c92c5fe4a6c458a3f9b4f046e7ce7ffabbb7bb7dbf2000545`
 
 Main changes:
-- Remade Battery Analyzer; battery analysis is calculated from the **latest unplug cycle**.
-- Real battery capacity is read from OPlus `battery_fcc`.
-- Fixed **System Log Debug**: correctly toggles ROM logcat/logd.
-- Log Debug is independent from Cooldown.
-- Remade Debloat App Logic: stronger and cleaner.
-- Fixed Cleanup progress label: Network now shows reset-network progress correctly.
-- Cleaner AIO Ace5/13R UI.
+- Fixed Deep Debloat issue that could prevent Bluetooth from turning on.
+- Fixed overlay/.replace permissions to prevent missing system apps after debloat.
+- Improved Restore All to automatically repair state for devices affected by the buggy build.
 
-Highlights:
-
-- Updated visible author text to **@keobamien**.
-- Redesigned the realtime log UI.
-- Removed the duplicate old realtime log box in the Cleanup tab.
-- Added a reboot recommendation popup after successful Quick Cleanup / Full Cleanup.
-- Added clearer notes about the Zygisk requirement.
-- Kept backend logging/export behavior unchanged.
-- Preserved the main Debloat, Cleanup, Battery, and Performance logic.
+> Recommended update for all v3.2.0 users, especially if you have run Deep Debloat. After updating, if you experienced Bluetooth or system app issues, tap **Restore All** then reboot.
 
 ---
 
