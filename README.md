@@ -136,20 +136,12 @@ Tuỳ tính năng, log có thể được ghi trong các thư mục tạm của 
 
 ## Phiên bản hiện tại
 
-**AIO Ace5 v3.2.1**
+AIO Ace5 v3.2.2
 
-Bản phát hành hiện tại: **v3.2.1**
-
+Sửa Battery Analyzer lấy đúng mốc rút sạc theo đầu đoạn xả hiện tại giống Android Settings.
+Sửa lỗi ghép sai pin lúc rút sạc với mAh cũ.
 SHA256:
-`dd0ed547e9bd7e6c92c5fe4a6c458a3f9b4f046e7ce7ffabbb7bb7dbf2000545`
-
-Điểm mới chính:
-- Sửa lỗi Deep Debloat có thể làm Bluetooth không bật được.
-- Sửa quyền overlay/.replace để tránh lỗi mất app hệ thống sau debloat.
-- Cải thiện Restore toàn bộ để tự sửa trạng thái cho máy đã chạy bản lỗi.
-
-> Bản cập nhật khuyến nghị cho tất cả user v3.2.0, đặc biệt nếu đã từng chạy Deep Debloat. Sau khi cập nhật, nếu từng bị lỗi Bluetooth hoặc app hệ thống, hãy bấm **Restore toàn bộ** rồi reboot.
-
+3A92CD23C97CB8AA1DBBFEC733CFEF9050C920E1EB628D00A1F97789EC0A481F
 ---
 
 ## Cài đặt
