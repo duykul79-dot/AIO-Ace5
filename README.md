@@ -140,8 +140,7 @@ AIO Ace5 v3.2.2
 
 Sửa Battery Analyzer lấy đúng mốc rút sạc theo đầu đoạn xả hiện tại giống Android Settings.
 Sửa lỗi ghép sai pin lúc rút sạc với mAh cũ.
-SHA256:
-3A92CD23C97CB8AA1DBBFEC733CFEF9050C920E1EB628D00A1F97789EC0A481F
+
 ---
 
 ## Cài đặt
